@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Flashcard - HSK</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Chinese Flashcard 中文</h1>
+            <div class="stats-bar">
+                <span class="stat remember">✓ จำได้: <span id="rememberCount">0</span></span>
+                <span class="stat not-sure">? ไม่แน่ใจ: <span id="notSureCount">0</span></span>
+                <span class="stat forgot">✗ จำไม่ได้: <span id="forgotCount">0</span></span>
+                <span class="stat total">📚 ทั้งหมด: <span id="totalCount">0</span></span>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-remember" id="progressRemember"></div>
+                <div class="progress-not-sure" id="progressNotSure"></div>
+                <div class="progress-forgot" id="progressForgot"></div>
+            </div>
+            <div class="progress-text">
+                <span id="currentIndex">0</span> / <span id="totalCards">0</span>
+            </div>
+        </div>
+
+        <!-- Filter Options -->
+        <div class="filter-section">
+            <label>แสดง:</label>
+            <select id="filterSelect">
+                <option value="all">ทั้งหมด</option>
+                <option value="unseen">ยังไม่ได้ดู</option>
+                <option value="remember">จำได้</option>
+                <option value="not-sure">ไม่แน่ใจ</option>
+                <option value="forgot">จำไม่ได้</option>
+            </select>
+            <button id="shuffleBtn" class="btn-shuffle">🔀 สุ่มการ์ด</button>
+            <button id="resetBtn" class="btn-reset">🔄 รีเซ็ตสถิติ</button>
+        </div>
+
+        <!-- Flashcard -->
+        <div class="flashcard-container">
+            <div class="flashcard" id="flashcard">
+                <!-- Front Side -->
+                <div class="card-front">
+                    <div class="card-type" id="cardType"></div>
+                    <div class="hanzi" id="hanzi"></div>
+                    <button class="btn-sound" id="soundBtn" title="ฟังเสียง">
+                        🔊
+                    </button>
+                    <p class="flip-hint">คลิกการ์ดเพื่อดูความหมาย</p>
+                </div>
+                
+                <!-- Back Side -->
+                <div class="card-back">
+                    <div class="hanzi-small" id="hanziBack"></div>
+                    <div class="pinyin" id="pinyin"></div>
+                    <div class="meaning" id="meaning"></div>
+                    <div class="example">
+                        <div class="example-cn" id="exampleCn"></div>
+                        <div class="example-th" id="exampleTh"></div>
+                    </div>
+                    <div class="note" id="note"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stroke Order Section -->
+        <div class="stroke-section">
+            <button class="btn-stroke" id="strokeBtn">📝 ดูลำดับขีด</button>
+            <div class="stroke-container" id="strokeContainer">
+                <div class="stroke-display" id="strokeDisplay"></div>
+                <p class="stroke-hint">คลิกที่ตัวอักษรเพื่อดูลำดับขีด</p>
+            </div>
+        </div>
+
+        <!-- Answer Buttons -->
+        <div class="answer-buttons">
+            <button class="btn-answer btn-forgot" id="forgotBtn">
+                ❌ จำไม่ได้
+            </button>
+            <button class="btn-answer btn-not-sure" id="notSureBtn">
+                🤔 ไม่แน่ใจ
+            </button>
+            <button class="btn-answer btn-remember" id="rememberBtn">
+                ✅ จำได้
+            </button>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="btn-nav" id="prevBtn">⬅️ ก่อนหน้า</button>
+            <button class="btn-nav" id="nextBtn">ถัดไป ➡️</button>
+        </div>
+
+        <!-- Keyboard Shortcuts Info -->
+        <div class="shortcuts-info">
+            <p>⌨️ ปุ่มลัด: <kbd>Space</kbd> พลิกการ์ด | <kbd>←</kbd><kbd>→</kbd> เปลี่ยนการ์ด | <kbd>1</kbd> จำไม่ได้ | <kbd>2</kbd> ไม่แน่ใจ | <kbd>3</kbd> จำได้ | <kbd>S</kbd> ฟังเสียง</p>
+        </div>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div class="modal" id="statsModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2>📊 สถิติการเรียน</h2>
+            <div class="stats-detail">
+                <div class="stat-item">
+                    <div class="stat-circle remember-circle">
+                        <span id="statRememberPercent">0%</span>
+                    </div>
+                    <p>จำได้</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-circle not-sure-circle">
+                        <span id="statNotSurePercent">0%</span>
+                    </div>
+                    <p>ไม่แน่ใจ</p>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-circle forgot-circle">
+                        <span id="statForgotPercent">0%</span>
+                    </div>
+                    <p>จำไม่ได้</p>
+                </div>
+            </div>
+            <div class="study-session">
+                <p>📅 เซสชั่นการเรียนวันนี้: <span id="sessionCount">0</span> คำ</p>
+                <p>⏱️ เวลาเรียน: <span id="studyTime">0</span> นาที</p>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-stats" id="statsBtn">📊 สถิติ</button>
+
+    <script src="words.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
