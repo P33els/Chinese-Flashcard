@@ -71,44 +71,6 @@ body {
     color: #e8c170;
 }
 
-/* Progress Bar */
-.progress-container {
-    margin-bottom: 20px;
-}
-
-.progress-bar {
-    height: 10px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-}
-
-.progress-remember {
-    background: #2ed573;
-    height: 100%;
-    transition: width 0.3s ease;
-}
-
-.progress-not-sure {
-    background: #ffc107;
-    height: 100%;
-    transition: width 0.3s ease;
-}
-
-.progress-forgot {
-    background: #ff4757;
-    height: 100%;
-    transition: width 0.3s ease;
-}
-
-.progress-text {
-    text-align: center;
-    margin-top: 8px;
-    font-size: 0.9rem;
-    color: #a0a0a0;
-}
-
 /* Filter Section */
 .filter-section {
     display: flex;
