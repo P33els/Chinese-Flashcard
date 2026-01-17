@@ -2,12 +2,21 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Chinese Flashcard - HSK</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <p>กำลังโหลดคำศัพท์...</p>
+    </div>
+
     <div class="container">
         <!-- Header -->
         <header class="header">
@@ -25,6 +34,7 @@
             <label>แสดง:</label>
             <select id="filterSelect">
                 <option value="all">ทั้งหมด</option>
+                <option value="due">ถึงเวลาทบทวน</option>
                 <option value="unseen">ยังไม่ได้ดู</option>
                 <option value="remember">จำได้</option>
                 <option value="not-sure">ไม่แน่ใจ</option>
@@ -34,12 +44,25 @@
             <button id="resetBtn" class="btn-reset">🔄 รีเซ็ตสถิติ</button>
         </div>
 
+        <!-- Progress Bar -->
+        <div class="progress-container">
+            <div class="progress-bar-wrapper">
+                <div class="progress-bar" id="progressRemember"></div>
+                <div class="progress-bar" id="progressNotSure"></div>
+                <div class="progress-bar" id="progressForgot"></div>
+            </div>
+            <div class="card-counter">
+                <span id="currentIndex">1</span> / <span id="totalCards">0</span>
+            </div>
+        </div>
+
         <!-- Flashcard -->
         <div class="flashcard-container">
             <div class="flashcard" id="flashcard">
                 <!-- Front Side -->
                 <div class="card-front">
                     <div class="card-type" id="cardType"></div>
+                    <div class="srs-indicator" id="srsIndicator"></div>
                     <div class="hanzi" id="hanzi"></div>
                     <button class="btn-sound" id="soundBtn" title="ฟังเสียง">
                         🔊
@@ -71,22 +94,28 @@
         </div>
 
         <!-- Answer Buttons -->
-        <div class="answer-buttons">
-            <button class="btn-answer btn-forgot" id="forgotBtn">
-                ❌ จำไม่ได้
+        <div class="answer-buttons" role="group" aria-label="ปุ่มตอบคำถาม">
+            <button class="btn-answer btn-forgot" id="forgotBtn" aria-label="จำไม่ได้ กดปุ่ม 1">
+                <span class="btn-emoji">❌</span>
+                <span class="btn-text">จำไม่ได้</span>
+                <span class="btn-shortcut">1</span>
             </button>
-            <button class="btn-answer btn-not-sure" id="notSureBtn">
-                🤔 ไม่แน่ใจ
+            <button class="btn-answer btn-not-sure" id="notSureBtn" aria-label="ไม่แน่ใจ กดปุ่ม 2">
+                <span class="btn-emoji">🤔</span>
+                <span class="btn-text">ไม่แน่ใจ</span>
+                <span class="btn-shortcut">2</span>
             </button>
-            <button class="btn-answer btn-remember" id="rememberBtn">
-                ✅ จำได้
+            <button class="btn-answer btn-remember" id="rememberBtn" aria-label="จำได้ กดปุ่ม 3">
+                <span class="btn-emoji">✅</span>
+                <span class="btn-text">จำได้</span>
+                <span class="btn-shortcut">3</span>
             </button>
         </div>
 
         <!-- Navigation -->
-        <div class="navigation">
-            <button class="btn-nav" id="prevBtn">⬅️ ก่อนหน้า</button>
-            <button class="btn-nav" id="nextBtn">ถัดไป ➡️</button>
+        <div class="navigation" role="navigation" aria-label="การเปลี่ยนการ์ด">
+            <button class="btn-nav" id="prevBtn" aria-label="การ์ดก่อนหน้า กดลูกศรซ้าย">⬅️ ก่อนหน้า</button>
+            <button class="btn-nav" id="nextBtn" aria-label="การ์ดถัดไป กดลูกศรขวา">ถัดไป ➡️</button>
         </div>
 
         <!-- Keyboard Shortcuts Info -->
@@ -94,40 +123,6 @@
             <p>⌨️ ปุ่มลัด: <kbd>Space</kbd> พลิกการ์ด | <kbd>←</kbd><kbd>→</kbd> เปลี่ยนการ์ด | <kbd>1</kbd> จำไม่ได้ | <kbd>2</kbd> ไม่แน่ใจ | <kbd>3</kbd> จำได้ | <kbd>S</kbd> ฟังเสียง</p>
         </div>
     </div>
-
-    <!-- Statistics Modal -->
-    <div class="modal" id="statsModal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeModal">&times;</span>
-            <h2>📊 สถิติการเรียน</h2>
-            <div class="stats-detail">
-                <div class="stat-item">
-                    <div class="stat-circle remember-circle">
-                        <span id="statRememberPercent">0%</span>
-                    </div>
-                    <p>จำได้</p>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-circle not-sure-circle">
-                        <span id="statNotSurePercent">0%</span>
-                    </div>
-                    <p>ไม่แน่ใจ</p>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-circle forgot-circle">
-                        <span id="statForgotPercent">0%</span>
-                    </div>
-                    <p>จำไม่ได้</p>
-                </div>
-            </div>
-            <div class="study-session">
-                <p>📅 เซสชั่นการเรียนวันนี้: <span id="sessionCount">0</span> คำ</p>
-                <p>⏱️ เวลาเรียน: <span id="studyTime">0</span> นาที</p>
-            </div>
-        </div>
-    </div>
-
-    <button class="btn-stats" id="statsBtn">📊 สถิติ</button>
 
     <script src="words.js"></script>
     <script src="app.js"></script>

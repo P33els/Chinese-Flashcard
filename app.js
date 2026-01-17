@@ -10,6 +10,19 @@ let userStats = {
     startTime: Date.now()
 };
 
+// SRS (Spaced Repetition System) Data Structure
+let srsData = {}; // { hanzi: { nextReview, interval, easeFactor, reviewCount } }
+
+// Prevent rapid clicking
+let isProcessing = false;
+let autoAdvanceTimeout = null;
+
+// Session state (for preserving position on refresh)
+let sessionState = {
+    currentIndex: 0,
+    filterValue: 'all'
+};
+
 // wordsData is loaded from words.js (external file)
 
 // DOM Elements
@@ -34,9 +47,6 @@ const nextBtn = document.getElementById('nextBtn');
 const shuffleBtn = document.getElementById('shuffleBtn');
 const resetBtn = document.getElementById('resetBtn');
 const filterSelect = document.getElementById('filterSelect');
-const statsBtn = document.getElementById('statsBtn');
-const statsModal = document.getElementById('statsModal');
-const closeModal = document.getElementById('closeModal');
 
 // Load words from JSON
 async function loadWords() {
@@ -51,7 +61,19 @@ async function loadWords() {
             words = await response.json();
         }
         loadUserStats();
+        
+        // Restore filter selection
+        if (sessionState.filterValue) {
+            filterSelect.value = sessionState.filterValue;
+        }
+        
         applyFilter();
+        
+        // Restore card position
+        if (sessionState.currentIndex >= 0 && sessionState.currentIndex < filteredWords.length) {
+            currentIndex = sessionState.currentIndex;
+        }
+        
         updateDisplay();
         updateStatsDisplay();
     } catch (error) {
@@ -60,7 +82,19 @@ async function loadWords() {
         if (typeof wordsData !== 'undefined' && wordsData !== null) {
             words = wordsData;
             loadUserStats();
+            
+            // Restore filter selection
+            if (sessionState.filterValue) {
+                filterSelect.value = sessionState.filterValue;
+            }
+            
             applyFilter();
+            
+            // Restore card position
+            if (sessionState.currentIndex >= 0 && sessionState.currentIndex < filteredWords.length) {
+                currentIndex = sessionState.currentIndex;
+            }
+            
             updateDisplay();
             updateStatsDisplay();
         } else {
@@ -79,20 +113,42 @@ function loadUserStats() {
         userStats.startTime = Date.now();
         userStats.sessionCount = 0;
     }
+    
+    // Load SRS data
+    const savedSRS = localStorage.getItem('flashcardSRS');
+    if (savedSRS) {
+        srsData = JSON.parse(savedSRS);
+    }
+    
+    // Load session state (position and filter)
+    const savedSession = localStorage.getItem('flashcardSession');
+    if (savedSession) {
+        sessionState = JSON.parse(savedSession);
+    }
 }
 
 // Save user stats to localStorage
 function saveUserStats() {
     localStorage.setItem('flashcardStats', JSON.stringify(userStats));
+    localStorage.setItem('flashcardSRS', JSON.stringify(srsData));
+    localStorage.setItem('flashcardSession', JSON.stringify(sessionState));
 }
 
 // Apply filter based on selection
 function applyFilter() {
     const filter = filterSelect.value;
+    const now = Date.now();
     
     switch (filter) {
         case 'all':
             filteredWords = [...words];
+            break;
+        case 'due':
+            // Show only cards that are due for review
+            filteredWords = words.filter(w => {
+                const srs = srsData[w.hanzi];
+                return !srs || !srs.nextReview || srs.nextReview <= now;
+            });
             break;
         case 'unseen':
             filteredWords = words.filter(w => 
@@ -142,6 +198,9 @@ function updateDisplay() {
     // Update progress
     document.getElementById('currentIndex').textContent = currentIndex + 1;
     
+    // Update SRS indicator
+    updateSRSIndicator(word.hanzi);
+    
     // Reset flip state
     flashcard.classList.remove('flipped');
     
@@ -154,6 +213,11 @@ function updateDisplay() {
     
     // Highlight current status
     highlightStatus(word.hanzi);
+    
+    // Save session state
+    sessionState.currentIndex = currentIndex;
+    sessionState.filterValue = filterSelect.value;
+    saveUserStats();
 }
 
 // Highlight current word status
@@ -181,6 +245,79 @@ function highlightStatus(hanzi) {
     }
 }
 
+// Update SRS indicator
+function updateSRSIndicator(hanzi) {
+    const srsIndicator = document.getElementById('srsIndicator');
+    const srs = srsData[hanzi];
+    
+    if (!srs || !srs.nextReview) {
+        srsIndicator.textContent = '🆕 คำใหม่';
+        srsIndicator.className = 'srs-indicator new';
+        return;
+    }
+    
+    const now = Date.now();
+    const daysUntil = Math.ceil((srs.nextReview - now) / (1000 * 60 * 60 * 24));
+    
+    if (daysUntil <= 0) {
+        srsIndicator.textContent = '⏰ ถึงเวลาทบทวน';
+        srsIndicator.className = 'srs-indicator due';
+    } else if (daysUntil === 1) {
+        srsIndicator.textContent = '📅 ทบทวนพรุ่งนี้';
+        srsIndicator.className = 'srs-indicator soon';
+    } else if (daysUntil <= 7) {
+        srsIndicator.textContent = `📅 ทบทวนใน ${daysUntil} วัน`;
+        srsIndicator.className = 'srs-indicator soon';
+    } else {
+        srsIndicator.textContent = `✅ ทบทวนใน ${daysUntil} วัน`;
+        srsIndicator.className = 'srs-indicator future';
+    }
+}
+
+// SRS Algorithm (similar to SM-2)
+function calculateNextReview(hanzi, quality) {
+    // quality: 3 = remember, 2 = not-sure, 1 = forgot
+    const srs = srsData[hanzi] || {
+        interval: 0,
+        easeFactor: 2.5,
+        reviewCount: 0,
+        nextReview: null
+    };
+    
+    let newInterval;
+    let newEaseFactor = srs.easeFactor;
+    
+    // Update ease factor based on quality
+    newEaseFactor = Math.max(1.3, srs.easeFactor + (0.1 - (3 - quality) * (0.08 + (3 - quality) * 0.02)));
+    
+    // Calculate new interval
+    if (quality < 2) {
+        // Forgot or not sure - reset to beginning
+        newInterval = 1;
+    } else {
+        if (srs.reviewCount === 0) {
+            newInterval = 1;
+        } else if (srs.reviewCount === 1) {
+            newInterval = 6;
+        } else {
+            newInterval = Math.round(srs.interval * newEaseFactor);
+        }
+    }
+    
+    // Calculate next review date
+    const nextReview = Date.now() + (newInterval * 24 * 60 * 60 * 1000);
+    
+    srsData[hanzi] = {
+        interval: newInterval,
+        easeFactor: newEaseFactor,
+        reviewCount: quality >= 2 ? srs.reviewCount + 1 : 0,
+        nextReview: nextReview,
+        lastReview: Date.now()
+    };
+    
+    return newInterval;
+}
+
 // Update stats display
 function updateStatsDisplay() {
     const rememberCount = Object.keys(userStats.remember).length;
@@ -193,28 +330,33 @@ function updateStatsDisplay() {
     document.getElementById('forgotCount').textContent = forgotCount;
     document.getElementById('totalCount').textContent = total;
     
-    // Update progress bar
-    const rememberPercent = (rememberCount / total) * 100;
-    const notSurePercent = (notSureCount / total) * 100;
-    const forgotPercent = (forgotCount / total) * 100;
+    // Update progress bar (handle division by zero)
+    const rememberPercent = total > 0 ? (rememberCount / total) * 100 : 0;
+    const notSurePercent = total > 0 ? (notSureCount / total) * 100 : 0;
+    const forgotPercent = total > 0 ? (forgotCount / total) * 100 : 0;
     
-    document.getElementById('progressRemember').style.width = rememberPercent + '%';
-    document.getElementById('progressNotSure').style.width = notSurePercent + '%';
-    document.getElementById('progressForgot').style.width = forgotPercent + '%';
+    // Update progress bar widths
+    const progressRemember = document.getElementById('progressRemember');
+    const progressNotSure = document.getElementById('progressNotSure');
+    const progressForgot = document.getElementById('progressForgot');
     
-    // Update modal stats
-    document.getElementById('statRememberPercent').textContent = Math.round(rememberPercent) + '%';
-    document.getElementById('statNotSurePercent').textContent = Math.round(notSurePercent) + '%';
-    document.getElementById('statForgotPercent').textContent = Math.round(forgotPercent) + '%';
-    document.getElementById('sessionCount').textContent = userStats.sessionCount;
-    
-    const studyMinutes = Math.round((Date.now() - userStats.startTime) / 60000);
-    document.getElementById('studyTime').textContent = studyMinutes;
+    if (progressRemember) progressRemember.style.width = rememberPercent + '%';
+    if (progressNotSure) progressNotSure.style.width = notSurePercent + '%';
+    if (progressForgot) progressForgot.style.width = forgotPercent + '%';
 }
 
 // Mark word status
 function markWord(status) {
-    if (filteredWords.length === 0) return;
+    if (filteredWords.length === 0 || isProcessing) return;
+    
+    // Prevent rapid clicking
+    isProcessing = true;
+    
+    // Clear any pending auto-advance
+    if (autoAdvanceTimeout) {
+        clearTimeout(autoAdvanceTimeout);
+        autoAdvanceTimeout = null;
+    }
     
     const hanzi = filteredWords[currentIndex].hanzi;
     
@@ -224,30 +366,111 @@ function markWord(status) {
     delete userStats.forgot[hanzi];
     
     // Add to selected category
+    let quality;
     switch (status) {
         case 'remember':
             userStats.remember[hanzi] = true;
+            quality = 3;
             break;
         case 'not-sure':
             userStats.notSure[hanzi] = true;
+            quality = 2;
             break;
         case 'forgot':
             userStats.forgot[hanzi] = true;
+            quality = 1;
             break;
     }
+    
+    // Update SRS
+    const daysUntil = calculateNextReview(hanzi, quality);
     
     userStats.sessionCount++;
     saveUserStats();
     updateStatsDisplay();
     highlightStatus(hanzi);
     
+    // Show SRS feedback
+    showSRSFeedback(status, daysUntil);
+    
+    // Disable buttons temporarily
+    disableAnswerButtons();
+    
     // Auto advance to next card
     if (currentIndex < filteredWords.length - 1) {
-        setTimeout(() => {
+        autoAdvanceTimeout = setTimeout(() => {
             currentIndex++;
             updateDisplay();
-        }, 300);
+            isProcessing = false;
+            enableAnswerButtons();
+            autoAdvanceTimeout = null;
+        }, 800);
+    } else {
+        // Show completion message if it's the last card
+        autoAdvanceTimeout = setTimeout(() => {
+            showCompletionMessage();
+            isProcessing = false;
+            enableAnswerButtons();
+            autoAdvanceTimeout = null;
+        }, 800);
     }
+}
+
+// Show SRS feedback
+function showSRSFeedback(status, daysUntil) {
+    const srsIndicator = document.getElementById('srsIndicator');
+    const messages = {
+        'remember': `✨ เยี่ยมมาก! ทบทวนอีกครั้งใน ${daysUntil} วัน`,
+        'not-sure': `💪 พยายามต่อไป! ทบทวนอีกครั้งใน ${daysUntil} วัน`,
+        'forgot': '📚 ไม่เป็นไร เจอกันพรุ่งนี้นะ!'
+    };
+    
+    const originalText = srsIndicator.textContent;
+    const originalClass = srsIndicator.className;
+    
+    srsIndicator.textContent = messages[status];
+    srsIndicator.className = 'srs-indicator feedback ' + status;
+    
+    setTimeout(() => {
+        srsIndicator.textContent = originalText;
+        srsIndicator.className = originalClass;
+    }, 3000);
+}
+
+// Show completion message
+function showCompletionMessage() {
+    const dueCount = words.filter(w => {
+        const srs = srsData[w.hanzi];
+        return !srs || !srs.nextReview || srs.nextReview <= Date.now();
+    }).length;
+    
+    if (dueCount === 0) {
+        alert('🎉 เยี่ยมมาก! คุณทบทวนครบทุกคำที่ถึงเวลาแล้ว\nกลับมาทบทวนใหม่ตามกำหนดเวลานะ!');
+        filterSelect.value = 'all';
+        applyFilter();
+        currentIndex = 0;
+        updateDisplay();
+    }
+}
+
+// Disable answer buttons
+function disableAnswerButtons() {
+    rememberBtn.disabled = true;
+    notSureBtn.disabled = true;
+    forgotBtn.disabled = true;
+    rememberBtn.style.opacity = '0.5';
+    notSureBtn.style.opacity = '0.5';
+    forgotBtn.style.opacity = '0.5';
+}
+
+// Enable answer buttons
+function enableAnswerButtons() {
+    rememberBtn.disabled = false;
+    notSureBtn.disabled = false;
+    forgotBtn.disabled = false;
+    rememberBtn.style.opacity = '1';
+    notSureBtn.style.opacity = '1';
+    forgotBtn.style.opacity = '1';
 }
 
 // Play sound using Web Speech API or Google Translate TTS
@@ -356,7 +579,8 @@ function shuffleCards() {
 
 // Reset all stats
 function resetStats() {
-    if (confirm('ต้องการรีเซ็ตสถิติทั้งหมดหรือไม่?')) {
+    if (confirm('ต้องการรีเซ็ตสถิติทั้งหมดหรือไม่?\n(รวมถึงข้อมูล SRS ด้วย)')) {
+        // Clear all stats
         userStats = {
             remember: {},
             notSure: {},
@@ -364,9 +588,35 @@ function resetStats() {
             sessionCount: 0,
             startTime: Date.now()
         };
+        srsData = {};
+        
+        // Clear session state (back to start)
+        sessionState = {
+            currentIndex: 0,
+            filterValue: 'all'
+        };
+        
+        // Clear processing flag
+        isProcessing = false;
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        
+        // Save and update
         saveUserStats();
         updateStatsDisplay();
+        
+        // Re-enable buttons
+        enableAnswerButtons();
+        
+        // Reset filter and position
+        filterSelect.value = 'all';
+        applyFilter();
+        currentIndex = 0;
         updateDisplay();
+        
+        alert('✅ รีเซ็ตสถิติเรียบร้อยแล้ว!');
     }
 }
 
@@ -389,14 +639,24 @@ notSureBtn.addEventListener('click', () => markWord('not-sure'));
 forgotBtn.addEventListener('click', () => markWord('forgot'));
 
 prevBtn.addEventListener('click', () => {
-    if (currentIndex > 0) {
+    if (currentIndex > 0 && !isProcessing) {
+        // Clear any pending auto-advance
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
         currentIndex--;
         updateDisplay();
     }
 });
 
 nextBtn.addEventListener('click', () => {
-    if (currentIndex < filteredWords.length - 1) {
+    if (currentIndex < filteredWords.length - 1 && !isProcessing) {
+        // Clear any pending auto-advance
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
         currentIndex++;
         updateDisplay();
     }
@@ -407,54 +667,64 @@ resetBtn.addEventListener('click', resetStats);
 
 filterSelect.addEventListener('change', () => {
     applyFilter();
+    currentIndex = 0;  // Reset to first card when filter changes
     updateDisplay();
-});
-
-statsBtn.addEventListener('click', () => {
-    updateStatsDisplay();
-    statsModal.classList.add('active');
-});
-
-closeModal.addEventListener('click', () => {
-    statsModal.classList.remove('active');
-});
-
-statsModal.addEventListener('click', (e) => {
-    if (e.target === statsModal) {
-        statsModal.classList.remove('active');
-    }
 });
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
-    // Don't trigger if typing in input
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    // Don't trigger if typing in input/textarea
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
     
     switch (e.key) {
         case ' ':
+        case 'Enter':
             e.preventDefault();
-            flashcard.classList.toggle('flipped');
+            if (!isProcessing) {
+                flashcard.classList.toggle('flipped');
+            }
             break;
         case 'ArrowLeft':
-            if (currentIndex > 0) {
+            e.preventDefault();
+            if (currentIndex > 0 && !isProcessing) {
+                // Clear any pending auto-advance
+                if (autoAdvanceTimeout) {
+                    clearTimeout(autoAdvanceTimeout);
+                    autoAdvanceTimeout = null;
+                }
                 currentIndex--;
                 updateDisplay();
             }
             break;
         case 'ArrowRight':
-            if (currentIndex < filteredWords.length - 1) {
+            e.preventDefault();
+            if (currentIndex < filteredWords.length - 1 && !isProcessing) {
+                // Clear any pending auto-advance
+                if (autoAdvanceTimeout) {
+                    clearTimeout(autoAdvanceTimeout);
+                    autoAdvanceTimeout = null;
+                }
                 currentIndex++;
                 updateDisplay();
             }
             break;
         case '1':
-            markWord('forgot');
+            e.preventDefault();
+            if (!isProcessing && !forgotBtn.disabled) {
+                markWord('forgot');
+            }
             break;
         case '2':
-            markWord('not-sure');
+            e.preventDefault();
+            if (!isProcessing && !notSureBtn.disabled) {
+                markWord('not-sure');
+            }
             break;
         case '3':
-            markWord('remember');
+            e.preventDefault();
+            if (!isProcessing && !rememberBtn.disabled) {
+                markWord('remember');
+            }
             break;
         case 's':
         case 'S':
@@ -470,5 +740,66 @@ if ('speechSynthesis' in window) {
     };
 }
 
+// Touch gesture support for mobile
+let touchStartX = 0;
+let touchEndX = 0;
+let touchStartY = 0;
+let touchEndY = 0;
+
+flashcard.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
+flashcard.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+}, { passive: true });
+
+function handleSwipe() {
+    const swipeThreshold = 50;
+    const diffX = touchEndX - touchStartX;
+    const diffY = touchEndY - touchStartY;
+    
+    // Check if horizontal swipe is more significant than vertical
+    if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > swipeThreshold) {
+        if (diffX > 0 && !isProcessing) {
+            // Swipe right - previous card
+            if (currentIndex > 0) {
+                if (autoAdvanceTimeout) {
+                    clearTimeout(autoAdvanceTimeout);
+                    autoAdvanceTimeout = null;
+                }
+                currentIndex--;
+                updateDisplay();
+            }
+        } else if (diffX < 0 && !isProcessing) {
+            // Swipe left - next card
+            if (currentIndex < filteredWords.length - 1) {
+                if (autoAdvanceTimeout) {
+                    clearTimeout(autoAdvanceTimeout);
+                    autoAdvanceTimeout = null;
+                }
+                currentIndex++;
+                updateDisplay();
+            }
+        }
+    }
+}
+
 // Load words on page load
 document.addEventListener('DOMContentLoaded', loadWords);
+
+// Hide loading screen after everything is loaded
+window.addEventListener('load', () => {
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+        setTimeout(() => {
+            loadingScreen.classList.add('hidden');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 300);
+        }, 500);
+    }
+});
