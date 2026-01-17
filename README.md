@@ -6,6 +6,8 @@
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Version](https://img.shields.io/badge/version-2.1.0-green)
 
+**Created by PRNXT**
+
 ---
 
 ## 🆕 Patch Update v2.1.0 (Jan 18, 2026)
@@ -255,7 +257,7 @@ MIT License - ใช้งานได้อย่างอิสระ
 
 <div align="center">
 
-**Made with ❤️ for Chinese learners**
+**Made with ❤️ for Chinese learners by PRNXT**
 
 [Report Bug](https://github.com/yourusername/flashcard/issues) · [Request Feature](https://github.com/yourusername/flashcard/issues)
 

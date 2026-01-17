@@ -746,15 +746,37 @@ body {
     font-size: 0.85rem;
     color: #a09080;
     border: 1px solid rgba(232, 193, 112, 0.1);
+    margin-bottom: 20px;
 }
 
 .shortcuts-info kbd {
     background: rgba(232, 193, 112, 0.15);
     padding: 3px 8px;
-    border-radius: 5px;
-    margin: 0 2px;
+    border-radius: 4px;
+    border: 1px solid rgba(232, 193, 112, 0.3);
+    font-family: monospace;
+    font-size: 0.85rem;
     color: #e8c170;
+    margin: 0 2px;
 }
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: 40px;
+    border-top: 1px solid rgba(212, 175, 55, 0.2);
+    color: rgba(212, 175, 55, 0.7);
+    font-size: 0.9rem;
+}
+
+.footer strong {
+    color: #d4af37;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+
 
 /* Stats Button */
 /* Responsive */
