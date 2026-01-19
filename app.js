@@ -6,6 +6,7 @@ let userStats = {
     remember: {},
     notSure: {},
     forgot: {},
+    difficult: {}, // Difficult words (starred)
     sessionCount: 0,
     startTime: Date.now()
 };
@@ -36,6 +37,7 @@ const exampleCnEl = document.getElementById('exampleCn');
 const exampleThEl = document.getElementById('exampleTh');
 const noteEl = document.getElementById('note');
 const soundBtn = document.getElementById('soundBtn');
+const starBtn = document.getElementById('starBtn');
 const strokeBtn = document.getElementById('strokeBtn');
 const strokeContainer = document.getElementById('strokeContainer');
 const strokeDisplay = document.getElementById('strokeDisplay');
@@ -112,6 +114,10 @@ function loadUserStats() {
         userStats = JSON.parse(saved);
         userStats.startTime = Date.now();
         userStats.sessionCount = 0;
+        // Ensure difficult property exists for backward compatibility
+        if (!userStats.difficult) {
+            userStats.difficult = {};
+        }
     }
     
     // Load SRS data
@@ -142,6 +148,9 @@ function applyFilter() {
     switch (filter) {
         case 'all':
             filteredWords = [...words];
+            break;
+        case 'difficult':
+            filteredWords = words.filter(w => userStats.difficult[w.hanzi]);
             break;
         case 'due':
             // Show only cards that are due for review
@@ -201,6 +210,9 @@ function updateDisplay() {
     // Update SRS indicator
     updateSRSIndicator(word.hanzi);
     
+    // Update star button (difficult word)
+    updateStarButton(word.hanzi);
+    
     // Reset flip state
     flashcard.classList.remove('flipped');
     
@@ -217,6 +229,33 @@ function updateDisplay() {
     // Save session state
     sessionState.currentIndex = currentIndex;
     sessionState.filterValue = filterSelect.value;
+    saveUserStats();
+}
+
+// Update star button state
+function updateStarButton(hanzi) {
+    if (userStats.difficult[hanzi]) {
+        starBtn.classList.add('active');
+        starBtn.textContent = '★';
+    } else {
+        starBtn.classList.remove('active');
+        starBtn.textContent = '☆';
+    }
+}
+
+// Toggle difficult word (star)
+function toggleDifficult() {
+    const word = filteredWords[currentIndex];
+    if (!word) return;
+    
+    if (userStats.difficult[word.hanzi]) {
+        delete userStats.difficult[word.hanzi];
+    } else {
+        userStats.difficult[word.hanzi] = true;
+    }
+    
+    updateStarButton(word.hanzi);
+    updateStatsDisplay();
     saveUserStats();
 }
 
@@ -323,11 +362,13 @@ function updateStatsDisplay() {
     const rememberCount = Object.keys(userStats.remember).length;
     const notSureCount = Object.keys(userStats.notSure).length;
     const forgotCount = Object.keys(userStats.forgot).length;
+    const difficultCount = Object.keys(userStats.difficult || {}).length;
     const total = words.length;
     
     document.getElementById('rememberCount').textContent = rememberCount;
     document.getElementById('notSureCount').textContent = notSureCount;
     document.getElementById('forgotCount').textContent = forgotCount;
+    document.getElementById('difficultCount').textContent = difficultCount;
     document.getElementById('totalCount').textContent = total;
     
     // Update progress bar (handle division by zero)
@@ -579,12 +620,13 @@ function shuffleCards() {
 
 // Reset all stats
 function resetStats() {
-    if (confirm('ต้องการรีเซ็ตสถิติทั้งหมดหรือไม่?\n(รวมถึงข้อมูล SRS ด้วย)')) {
+    if (confirm('ต้องการรีเซ็ตสถิติทั้งหมดหรือไม่?\n(รวมถึงข้อมูล SRS และคำยากด้วย)')) {
         // Clear all stats
         userStats = {
             remember: {},
             notSure: {},
             forgot: {},
+            difficult: {},
             sessionCount: 0,
             startTime: Date.now()
         };
@@ -637,6 +679,12 @@ strokeBtn.addEventListener('click', showStrokeOrder);
 rememberBtn.addEventListener('click', () => markWord('remember'));
 notSureBtn.addEventListener('click', () => markWord('not-sure'));
 forgotBtn.addEventListener('click', () => markWord('forgot'));
+
+// Star button for difficult words
+starBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleDifficult();
+});
 
 prevBtn.addEventListener('click', () => {
     if (currentIndex > 0 && !isProcessing) {
@@ -729,6 +777,11 @@ document.addEventListener('keydown', (e) => {
         case 's':
         case 'S':
             playSound();
+            break;
+        case 'd':
+        case 'D':
+            e.preventDefault();
+            toggleDifficult();
             break;
     }
 });

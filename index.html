@@ -6,130 +6,901 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Chinese Flashcard - HSK</title>
+    <title>Chinese Learning Games - 中文学习</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Home Page Specific Styles */
+        .home-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .home-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .home-header h1 {
+            font-size: 2.5rem;
+            color: #e8c170;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .home-header p {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+        }
+
+        /* Search Section */
+        .search-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .search-section h2 {
+            color: #d4af37;
+            margin-bottom: 16px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 14px 20px;
+            border-radius: 12px;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: #666;
+        }
+
+        .search-btn {
+            padding: 14px 28px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #d4af37, #b8962e);
+            color: #1a1a1a;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+        }
+
+        .search-results {
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-result-item {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-result-item:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: rgba(212, 175, 55, 0.3);
+            transform: translateX(5px);
+        }
+
+        .result-hanzi {
+            font-size: 1.8rem;
+            color: #e8c170;
+            font-family: 'Noto Serif SC', serif;
+            margin-bottom: 4px;
+        }
+
+        .result-pinyin {
+            color: #88c0d0;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .result-meaning {
+            color: #f5f0e6;
+            font-size: 0.95rem;
+        }
+
+        .result-type {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-left: 10px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+
+        /* Games Section */
+        .games-section h2 {
+            color: #d4af37;
+            margin-bottom: 24px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .game-card {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.2));
+            border-radius: 20px;
+            padding: 30px;
+            text-decoration: none;
+            color: inherit;
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(212, 175, 55, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            border-color: #d4af37;
+            box-shadow: 0 20px 40px rgba(212, 175, 55, 0.2);
+        }
+
+        .game-card:hover::before {
+            opacity: 1;
+        }
+
+        .game-icon {
+            font-size: 3.5rem;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .game-title {
+            font-size: 1.5rem;
+            color: #e8c170;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .game-subtitle {
+            font-size: 1.1rem;
+            color: #88c0d0;
+            margin-bottom: 12px;
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        .game-description {
+            color: #a0a0a0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .game-stats {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .game-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Coming Soon Badge */
+        .coming-soon {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .coming-soon-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Patch Notes Section */
+        .patch-notes {
+            background: rgba(212, 175, 55, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 12px;
+            padding: 0;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .patch-notes summary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #d4af37;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 16px 20px;
+            cursor: pointer;
+            list-style: none;
+            user-select: none;
+        }
+
+        .patch-notes summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .patch-notes summary:hover {
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .patch-notes-version {
+            background: linear-gradient(135deg, #d4af37, #b8962e);
+            color: #1a1a1a;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .patch-notes-toggle {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: #888;
+            transition: transform 0.3s ease;
+        }
+
+        .patch-notes[open] .patch-notes-toggle {
+            transform: rotate(180deg);
+        }
+
+        .patch-notes-content {
+            padding: 0 20px 20px 20px;
+        }
+
+        .patch-notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .patch-note-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 4px solid;
+        }
+
+        .patch-note-item.flashcard {
+            border-left-color: #ffd700;
+        }
+
+        .patch-note-item.grammar {
+            border-left-color: #88c0d0;
+        }
+
+        .patch-note-item.listening {
+            border-left-color: #c0392b;
+        }
+
+        .patch-note-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .patch-note-item.flashcard .patch-note-title {
+            color: #ffd700;
+        }
+
+        .patch-note-item.grammar .patch-note-title {
+            color: #88c0d0;
+        }
+
+        .patch-note-item.listening .patch-note-title {
+            color: #e74c3c;
+        }
+
+        .patch-note-desc {
+            color: #aaa;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        .patch-note-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .patch-feature-tag {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #999;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Footer */
+        .home-footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(212, 175, 55, 0.2);
+            color: #666;
+        }
+
+        .home-footer strong {
+            color: #d4af37;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .home-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .search-box {
+                flex-direction: column;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Word Detail Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            border: 2px solid rgba(212, 175, 55, 0.3);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #ff4757;
+        }
+
+        .modal-hanzi {
+            font-size: 3rem;
+            color: #e8c170;
+            font-family: 'Noto Serif SC', serif;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .modal-pinyin {
+            text-align: center;
+            color: #88c0d0;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .modal-type {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-type span {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .modal-meaning {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-meaning h4 {
+            color: #d4af37;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .modal-meaning p {
+            color: #f5f0e6;
+            font-size: 1.1rem;
+        }
+
+        .modal-example {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-example h4 {
+            color: #d4af37;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .modal-example-cn {
+            color: #f5f0e6;
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        .modal-example-th {
+            color: #a0a0a0;
+            font-size: 0.95rem;
+        }
+
+        .modal-note {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            border-left: 3px solid #d4af37;
+        }
+
+        .modal-note h4 {
+            color: #d4af37;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .modal-note p {
+            color: #c0b090;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .modal-sound-btn {
+            display: block;
+            margin: 20px auto 0;
+            padding: 10px 24px;
+            border-radius: 25px;
+            border: 2px solid #d4af37;
+            background: transparent;
+            color: #d4af37;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-sound-btn:hover {
+            background: #d4af37;
+            color: #1a1a1a;
+        }
+    </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-spinner"></div>
-        <p>กำลังโหลดคำศัพท์...</p>
-    </div>
-
-    <div class="container">
+    <div class="home-container">
         <!-- Header -->
-        <header class="header">
-            <h1>Chinese Flashcard 中文</h1>
-            <div class="stats-bar">
-                <span class="stat remember">✓ จำได้: <span id="rememberCount">0</span></span>
-                <span class="stat not-sure">? ไม่แน่ใจ: <span id="notSureCount">0</span></span>
-                <span class="stat forgot">✗ จำไม่ได้: <span id="forgotCount">0</span></span>
-                <span class="stat total">📚 ทั้งหมด: <span id="totalCount">0</span></span>
-            </div>
+        <header class="home-header">
+            <h1>🇨🇳 Chinese Learning Games</h1>
+            <p>เรียนภาษาจีนอย่างสนุกด้วยมินิเกม</p>
         </header>
 
-        <!-- Filter Options -->
-        <div class="filter-section">
-            <label>แสดง:</label>
-            <select id="filterSelect">
-                <option value="all">ทั้งหมด</option>
-                <option value="due">ถึงเวลาทบทวน</option>
-                <option value="unseen">ยังไม่ได้ดู</option>
-                <option value="remember">จำได้</option>
-                <option value="not-sure">ไม่แน่ใจ</option>
-                <option value="forgot">จำไม่ได้</option>
-            </select>
-            <button id="shuffleBtn" class="btn-shuffle">🔀 สุ่มการ์ด</button>
-            <button id="resetBtn" class="btn-reset">🔄 รีเซ็ตสถิติ</button>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-bar-wrapper">
-                <div class="progress-bar" id="progressRemember"></div>
-                <div class="progress-bar" id="progressNotSure"></div>
-                <div class="progress-bar" id="progressForgot"></div>
-            </div>
-            <div class="card-counter">
-                <span id="currentIndex">1</span> / <span id="totalCards">0</span>
-            </div>
-        </div>
-
-        <!-- Flashcard -->
-        <div class="flashcard-container">
-            <div class="flashcard" id="flashcard">
-                <!-- Front Side -->
-                <div class="card-front">
-                    <div class="card-type" id="cardType"></div>
-                    <div class="srs-indicator" id="srsIndicator"></div>
-                    <div class="hanzi" id="hanzi"></div>
-                    <button class="btn-sound" id="soundBtn" title="ฟังเสียง">
-                        🔊
-                    </button>
-                    <p class="flip-hint">คลิกการ์ดเพื่อดูความหมาย</p>
-                </div>
-                
-                <!-- Back Side -->
-                <div class="card-back">
-                    <div class="hanzi-small" id="hanziBack"></div>
-                    <div class="pinyin" id="pinyin"></div>
-                    <div class="meaning" id="meaning"></div>
-                    <div class="example">
-                        <div class="example-cn" id="exampleCn"></div>
-                        <div class="example-th" id="exampleTh"></div>
+               <details class="patch-notes">
+            <summary>
+                <span>🆕</span>
+                <span>What's New</span>
+                <span class="patch-notes-version">v2.2.0</span>
+                <span class="patch-notes-toggle">▼</span>
+            </summary>
+            <div class="patch-notes-content">
+                <div class="patch-notes-list">
+                    <!-- Flashcard Update -->
+                    <div class="patch-note-item flashcard">
+                        <div class="patch-note-title">
+                            <span>⭐</span>
+                            <span>Flashcard: Difficult Words System</span>
+                        </div>
+                        <div class="patch-note-desc">
+                            เพิ่มระบบทำเครื่องหมายคำยากด้วยปุ่มดาว สามารถกรองดูเฉพาะคำยากและติดตามสถิติได้
+                        </div>
+                        <div class="patch-note-features">
+                            <span class="patch-feature-tag">☆ Star Button</span>
+                            <span class="patch-feature-tag">🔍 Filter</span>
+                            <span class="patch-feature-tag">⌨️ Hotkey: D</span>
+                            <span class="patch-feature-tag">💾 Auto Save</span>
+                        </div>
                     </div>
-                    <div class="note" id="note"></div>
+
+                    <!-- Grammar Update -->
+                    <div class="patch-note-item grammar">
+                        <div class="patch-note-title">
+                            <span>📝</span>
+                            <span>Grammar: Multiple Question Types</span>
+                        </div>
+                        <div class="patch-note-desc">
+                            เพิ่มรูปแบบคำถามให้หลากหลาย ทั้งเติมคำในช่องว่าง เลือกความหมาย และเรียงประโยค
+                        </div>
+                        <div class="patch-note-features">
+                            <span class="patch-feature-tag">✍️ Fill Blank</span>
+                            <span class="patch-feature-tag">🎯 Choose Meaning</span>
+                            <span class="patch-feature-tag">🧩 Arrange Sentence</span>
+                            <span class="patch-feature-tag">🔗 Match Pairs</span>
+                        </div>
+                    </div>
+
+                    <!-- Listening Update -->
+                    <div class="patch-note-item listening">
+                        <div class="patch-note-title">
+                            <span>🎧</span>
+                            <span>Listening: HSK3 Format + Dual Modes</span>
+                        </div>
+                        <div class="patch-note-desc">
+                            แยกโหมดฝึกฟังคำศัพท์และประโยค พร้อมปรับเป็นรูปแบบ HSK3 (ไม่มี pinyin ในตัวเลือก)
+                        </div>
+                        <div class="patch-note-features">
+                            <span class="patch-feature-tag">🔤 Word Quiz</span>
+                            <span class="patch-feature-tag">💬 Sentence Quiz</span>
+                            <span class="patch-feature-tag">🎯 HSK3 Style</span>
+                            <span class="patch-feature-tag">🚫 No Pinyin</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </details>
 
-        <!-- Stroke Order Section -->
-        <div class="stroke-section">
-            <button class="btn-stroke" id="strokeBtn">📝 ดูลำดับขีด</button>
-            <div class="stroke-container" id="strokeContainer">
-                <div class="stroke-display" id="strokeDisplay"></div>
-                <p class="stroke-hint">คลิกที่ตัวอักษรเพื่อดูลำดับขีด</p>
+        <!-- Search Section -->
+        <section class="search-section">
+            <h2>🔍 ค้นหาคำศัพท์ (HSK3)</h2>
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" 
+                       placeholder="พิมพ์ภาษาจีน, พินอิน, หรือความหมาย..." 
+                       autocomplete="off">
+                <button class="search-btn" id="searchBtn">ค้นหา</button>
             </div>
-        </div>
+            <div class="search-results" id="searchResults"></div>
+        </section>
 
-        <!-- Answer Buttons -->
-        <div class="answer-buttons" role="group" aria-label="ปุ่มตอบคำถาม">
-            <button class="btn-answer btn-forgot" id="forgotBtn" aria-label="จำไม่ได้ กดปุ่ม 1">
-                <span class="btn-emoji">❌</span>
-                <span class="btn-text">จำไม่ได้</span>
-                <span class="btn-shortcut">1</span>
-            </button>
-            <button class="btn-answer btn-not-sure" id="notSureBtn" aria-label="ไม่แน่ใจ กดปุ่ม 2">
-                <span class="btn-emoji">🤔</span>
-                <span class="btn-text">ไม่แน่ใจ</span>
-                <span class="btn-shortcut">2</span>
-            </button>
-            <button class="btn-answer btn-remember" id="rememberBtn" aria-label="จำได้ กดปุ่ม 3">
-                <span class="btn-emoji">✅</span>
-                <span class="btn-text">จำได้</span>
-                <span class="btn-shortcut">3</span>
-            </button>
-        </div>
+        <!-- Games Section -->
+        <section class="games-section">
+            <h2>🎮 เลือกเกม</h2>
+            <div class="games-grid">
+                <!-- Flashcard Game -->
+                <a href="flashcard.html" class="game-card">
+                    <span class="game-icon">📚</span>
+                    <h3 class="game-title">Flashcard</h3>
+                    <p class="game-subtitle">单词卡片</p>
+                    <p class="game-description">ฝึกจำคำศัพท์ด้วยระบบ Flashcard พร้อมระบบ Spaced Repetition ช่วยให้จำได้นานขึ้น</p>
+                    <div class="game-stats">
+                        <span class="game-stat">📖 <span id="wordCount">0</span> คำศัพท์</span>
+                        <span class="game-stat">⏱️ ทบทวนทุกวัน</span>
+                    </div>
+                </a>
 
-        <!-- Navigation -->
-        <div class="navigation" role="navigation" aria-label="การเปลี่ยนการ์ด">
-            <button class="btn-nav" id="prevBtn" aria-label="การ์ดก่อนหน้า กดลูกศรซ้าย">⬅️ ก่อนหน้า</button>
-            <button class="btn-nav" id="nextBtn" aria-label="การ์ดถัดไป กดลูกศรขวา">ถัดไป ➡️</button>
-        </div>
+                <!-- Grammar Game -->
+                <a href="grammar.html" class="game-card">
+                    <span class="game-icon">📝</span>
+                    <h3 class="game-title">Grammar Quiz</h3>
+                    <p class="game-subtitle">语法练习</p>
+                    <p class="game-description">ฝึกไวยากรณ์จีนผ่านการทำแบบฝึกหัด เรียนรู้โครงสร้างประโยคและการใช้คำ</p>
+                    <div class="game-stats">
+                        <span class="game-stat">📖 <span id="grammarCount">0</span> หัวข้อ</span>
+                        <span class="game-stat">✏️ แบบฝึกหัด</span>
+                    </div>
+                </a>
 
-        <!-- Keyboard Shortcuts Info -->
-        <div class="shortcuts-info">
-            <p>⌨️ ปุ่มลัด: <kbd>Space</kbd> พลิกการ์ด | <kbd>←</kbd><kbd>→</kbd> เปลี่ยนการ์ด | <kbd>1</kbd> จำไม่ได้ | <kbd>2</kbd> ไม่แน่ใจ | <kbd>3</kbd> จำได้ | <kbd>S</kbd> ฟังเสียง</p>
-        </div>
+                <!-- Listening Game -->
+                <a href="listening.html" class="game-card">
+                    <span class="game-icon">🎧</span>
+                    <h3 class="game-title">Listening</h3>
+                    <p class="game-subtitle">听力练习</p>
+                    <p class="game-description">ฝึกฟังภาษาจีนจากเสียงพูด และเลือกคำตอบที่ถูกต้อง</p>
+                    <div class="game-stats">
+                        <span class="game-stat">🎵 ฟังและตอบ</span>
+                        <span class="game-stat">📈 ฝึกหู</span>
+                    </div>
+                </a>
+
+                <!-- Writing Game (Coming Soon) -->
+                <div class="game-card coming-soon">
+                    <span class="coming-soon-badge">เร็วๆ นี้</span>
+                    <span class="game-icon">✍️</span>
+                    <h3 class="game-title">Stroke Order</h3>
+                    <p class="game-subtitle">笔顺练习</p>
+                    <p class="game-description">ฝึกเขียนตัวอักษรจีนตามลำดับขีดที่ถูกต้อง</p>
+                    <div class="game-stats">
+                        <span class="game-stat">🖌️ ฝึกเขียน</span>
+                        <span class="game-stat">📝 จำลำดับขีด</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Patch Notes -->
+ 
 
         <!-- Footer -->
-        <footer class="footer">
+        <footer class="home-footer">
             <p>Made with ❤️ by <strong>PRNXT</strong></p>
         </footer>
     </div>
 
+    <!-- Word Detail Modal -->
+    <div class="modal-overlay" id="wordModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-hanzi" id="modalHanzi"></div>
+            <div class="modal-pinyin" id="modalPinyin"></div>
+            <div class="modal-type"><span id="modalType"></span></div>
+            <div class="modal-meaning">
+                <h4>ความหมาย</h4>
+                <p id="modalMeaning"></p>
+            </div>
+            <div class="modal-example">
+                <h4>ตัวอย่างประโยค</h4>
+                <p class="modal-example-cn" id="modalExampleCn"></p>
+                <p class="modal-example-th" id="modalExampleTh"></p>
+            </div>
+            <div class="modal-note" id="modalNoteSection">
+                <h4>📌 หมายเหตุ</h4>
+                <p id="modalNote"></p>
+            </div>
+            <button class="modal-sound-btn" id="modalSoundBtn">🔊 ฟังเสียง</button>
+        </div>
+    </div>
+
     <script src="words.js"></script>
-    <script src="app.js"></script>
+    <script src="grammar.js"></script>
+    <script>
+        // Load word data
+        let words = [];
+        let grammarPointsList = [];
+
+        // Load words
+        async function loadData() {
+            try {
+                // Load words
+                if (typeof wordsData !== 'undefined') {
+                    words = wordsData;
+                } else {
+                    const response = await fetch('words.json');
+                    words = await response.json();
+                }
+                document.getElementById('wordCount').textContent = words.length;
+
+                // Load grammar - try embedded data first
+                if (typeof grammarData !== 'undefined' && grammarData !== null) {
+                    grammarPointsList = grammarData;
+                } else {
+                    try {
+                        const grammarResponse = await fetch('cn_grammar.json');
+                        const data = await grammarResponse.json();
+                        grammarPointsList = data.grammar_points || [];
+                    } catch (e) {
+                        console.log('Could not fetch grammar JSON, using embedded data');
+                    }
+                }
+                document.getElementById('grammarCount').textContent = grammarPointsList.length;
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchResults = document.getElementById('searchResults');
+
+        function performSearch() {
+            const query = searchInput.value.trim().toLowerCase();
+            
+            if (!query) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            const results = words.filter(word => {
+                return word.hanzi.toLowerCase().includes(query) ||
+                       word.pinyin.toLowerCase().includes(query) ||
+                       word.meaning.toLowerCase().includes(query);
+            }).slice(0, 20); // Limit to 20 results
+
+            displayResults(results);
+        }
+
+        function displayResults(results) {
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="no-results">ไม่พบคำศัพท์ที่ค้นหา</div>';
+            } else {
+                searchResults.innerHTML = results.map(word => `
+                    <div class="search-result-item" data-hanzi="${word.hanzi}">
+                        <div class="result-hanzi">${word.hanzi} <span class="result-type">${word.type || ''}</span></div>
+                        <div class="result-pinyin">${word.pinyin}</div>
+                        <div class="result-meaning">${word.meaning}</div>
+                    </div>
+                `).join('');
+
+                // Add click events
+                document.querySelectorAll('.search-result-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const hanzi = item.dataset.hanzi;
+                        const word = words.find(w => w.hanzi === hanzi);
+                        if (word) showWordDetail(word);
+                    });
+                });
+            }
+            searchResults.classList.add('active');
+        }
+
+        // Word detail modal
+        const modal = document.getElementById('wordModal');
+        const modalClose = document.getElementById('modalClose');
+
+        function showWordDetail(word) {
+            document.getElementById('modalHanzi').textContent = word.hanzi;
+            document.getElementById('modalPinyin').textContent = word.pinyin;
+            document.getElementById('modalType').textContent = word.type || 'คำศัพท์';
+            document.getElementById('modalMeaning').textContent = word.meaning;
+            document.getElementById('modalExampleCn').textContent = word.example_cn || '';
+            document.getElementById('modalExampleTh').textContent = word.example_th || '';
+            
+            const noteSection = document.getElementById('modalNoteSection');
+            const noteText = document.getElementById('modalNote');
+            if (word.note) {
+                noteSection.style.display = 'block';
+                noteText.innerHTML = word.note;
+            } else {
+                noteSection.style.display = 'none';
+            }
+
+            modal.classList.add('active');
+        }
+
+        modalClose.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // Sound button
+        document.getElementById('modalSoundBtn').addEventListener('click', () => {
+            const hanzi = document.getElementById('modalHanzi').textContent;
+            speakChinese(hanzi);
+        });
+
+        function speakChinese(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Event listeners
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+
+        // Live search
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.length >= 1) {
+                performSearch();
+            } else {
+                searchResults.classList.remove('active');
+            }
+        });
+
+        // Close search results when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.search-section')) {
+                searchResults.classList.remove('active');
+            }
+        });
+
+        // Initialize
+        loadData();
+    </script>
 </body>
 </html>
