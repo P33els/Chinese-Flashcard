@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,9 +9,16 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Chinese Flashcard - HSK</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="theme.js"></script>
 </head>
+
 <body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loading-spinner"></div>
@@ -76,7 +84,7 @@
                     </button>
                     <p class="flip-hint">คลิกการ์ดเพื่อดูความหมาย</p>
                 </div>
-                
+
                 <!-- Back Side -->
                 <div class="card-back">
                     <div class="card-type" id="cardType"></div>
@@ -128,7 +136,8 @@
 
         <!-- Keyboard Shortcuts Info -->
         <div class="shortcuts-info">
-            <p>⌨️ ปุ่มลัด: <kbd>Space</kbd> พลิกการ์ด | <kbd>←</kbd><kbd>→</kbd> เปลี่ยนการ์ด | <kbd>1</kbd> จำไม่ได้ | <kbd>2</kbd> ไม่แน่ใจ | <kbd>3</kbd> จำได้ | <kbd>S</kbd> ฟังเสียง</p>
+            <p>⌨️ ปุ่มลัด: <kbd>Space</kbd> พลิกการ์ด | <kbd>←</kbd><kbd>→</kbd> เปลี่ยนการ์ด | <kbd>1</kbd> จำไม่ได้ |
+                <kbd>2</kbd> ไม่แน่ใจ | <kbd>3</kbd> จำได้ | <kbd>S</kbd> ฟังเสียง</p>
         </div>
 
         <!-- Footer -->
@@ -140,4 +149,5 @@
     <script src="words.js"></script>
     <script src="app.js"></script>
 </body>
+
 </html>

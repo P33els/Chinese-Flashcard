@@ -4,47 +4,42 @@
 
 ![Chinese Flashcard](https://img.shields.io/badge/HSK-Vocabulary-red)
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-2.2.0-green)
+![Version](https://img.shields.io/badge/version-3.1.0-green)
 
 **Created by PRNXT**
 
 ---
 
-## 🆕 Patch Update v2.2.0 (Jan 19, 2026)
+## 🆕 Patch Update v3.1.0 (Feb 12, 2026)
 
-### ⭐ Flashcard - Difficult Words Feature
-- ✅ **Star Button** - เพิ่มปุ่มดาว (☆/★) เพื่อทำเครื่องหมายคำยาก
-- ✅ **Difficult Filter** - กรองดูเฉพาะคำที่ทำเครื่องหมายไว้
-- ✅ **Difficult Stats** - แสดงจำนวนคำยากในแถบสถิติ
-- ✅ **Keyboard Shortcut** - กด `D` เพื่อ toggle ดาว
-- ✅ **LocalStorage Persistence** - บันทึกคำยากถาวร
-- ✅ **UI/UX Enhancement**:
-  - ปุ่มดาวอยู่มุมขวาบนของการ์ด
-  - Gold theme (#ffd700) สำหรับคำยาก
-  - Card-type ย้ายไปด้านหลังการ์ด
-  - Hover animation บนปุ่มดาว
+### 🙈 Blur Study Mode
+- ✅ **Blur Dropdown** - เลือกเบลอตัวจีน, พินอิน, หรือคำแปลแยกกันได้
+- ✅ **Multi-select** - เบลอหลายคอลัมน์พร้อมกัน
+- ✅ **Mobile Tap** - แตะเปิดดู แตะซ้ำเบลอกลับ
+- ✅ **Desktop Hover** - เลื่อนเมาส์เปิดดูอัตโนมัติ
 
-### 📝 Grammar Quiz - Question Variety
-- ✅ **Multiple Question Types** - เพิ่มรูปแบบคำถามให้หลากหลาย:
-  - **Fill in the Blank** - เติมคำลงในช่องว่าง
-  - **Choose Meaning** - เลือกความหมายที่ถูกต้อง
-  - **Choose Correct Usage** - เลือกประโยคที่ใช้ถูกต้อง
-- ✅ **Drag & Drop Game** - เกมเพิ่มเติม:
-  - **Arrange Sentence** - เรียงคำให้เป็นประโยค
-  - **Match Pairs** - จับคู่ไวยากรณ์ที่สัมพันธ์กัน
+### 🎨 Warm Crimson + Charcoal Theme
+- ✅ **Crimson Accent** - สีแดง Crimson (#f87171) สำหรับ accent หลัก
+- ✅ **Purple Pinyin** - สีม่วง (#a78bfa) สำหรับพินอิน
+- ✅ **Eye-Friendly Hanzi** - สีครีมอุ่น (#f5f0e8) สำหรับตัวจีนทุกหน้า
+- ✅ **Charcoal Background** - พื้นหลัง Zinc (#18181b) สะอาดตา
+- ✅ **Dark & Light Mode** - รองรับทั้งสองโหมด
 
-### 🎧 Listening Practice - HSK3 Style
-- ✅ **Mode Selection** - แยกโหมดการฝึกฟัง:
-  - **Word Quiz** - ฟังและเลือกคำศัพท์
-  - **Sentence Quiz** - ฟังและเลือกประโยค
-- ✅ **HSK3 Format** - ปรับรูปแบบตาม HSK3:
-  - เอาพินอิน (pinyin) ออกจากตัวเลือก
-  - แสดงเฉพาะตัวอักษรจีน (汉字)
-- ✅ **Multiple Question Types**:
-  - **Listen to Word** - ฟังคำศัพท์และเลือกคำที่ถูกต้อง
-  - **Listen to Sentence** - ฟังประโยคและเลือกประโยคที่ถูกต้อง
+### 🧹 Data Cleanup
+- ✅ **Deduplication** - ลบคำศัพท์ซ้ำ 110 คำ (1,231 → 1,121)
+- ✅ **A-Z Sorting** - เรียงตามพินอินอัตโนมัติ
+
+### 📱 Mobile Fixes
+- ✅ **Tap Highlight Removed** - ลบสีฟ้าเมื่อแตะบนมือถือ
+- ✅ **Blur Touch Fix** - แก้เบลอค้างบน touch devices
 
 ### Previous Updates
+
+#### v3.0.0 (Feb 11, 2026)
+- 🔍 **Search Modal** - ค้นหาคำศัพท์แบบ Modal (Ctrl+K)
+- 📋 **Vocabulary Table** - หน้าตารางคำศัพท์ทั้งหมด
+- 🎨 **UI Redesign v3.0** - Premium UI, Inter Font, Glassmorphism
+- 🌗 **Dark/Light Theme** - ระบบธีมสว่าง/มืด + localStorage
 
 #### v2.1.0 (Jan 18, 2026)
 
@@ -163,11 +158,15 @@ python -m http.server 8000
 
 ```
 flashcard/
-├── index.html      # หน้าเว็บหลัก
-├── styles.css      # สไตล์และธีม
-├── app.js          # โลจิกของแอปพลิเคชัน
-├── words.json      # ข้อมูลคำศัพท์ (JSON)
-├── words.js        # ข้อมูลคำศัพท์ (JS - สำหรับ file://)
+├── index.html      # หน้าเว็บหลัก (Home + Search Modal)
+├── flashcard.html  # หน้า Flashcard
+├── vocab.html      # หน้า Vocabulary Table + Blur Mode
+├── grammar.html    # หน้า Grammar Quiz
+├── listening.html  # หน้า Listening Practice
+├── styles.css      # สไตล์และธีม (CSS Variables)
+├── theme.js        # ระบบสลับ Dark/Light theme
+├── app.js          # โลจิกของ Flashcard
+├── words.js        # ข้อมูลคำศัพท์ 1,121 คำ
 └── README.md       # ไฟล์นี้
 ```
 
@@ -233,7 +232,7 @@ flashcard/
 ## ⚡ Performance
 
 - **Loading Time**: < 1 second (with loading screen animation)
-- **Bundle Size**: ~70KB (uncompressed, including 242+ words)
+- **Bundle Size**: ~80KB (uncompressed, including 1,121 words)
 - **No External Dependencies**: Vanilla JavaScript only
 - **Offline Ready**: Works with `file://` protocol
 - **Memory Efficient**: LocalStorage-based persistence
@@ -260,6 +259,17 @@ MIT License - ใช้งานได้อย่างอิสระ
 - อัพเดท README เมื่อเพิ่มฟีเจอร์
 
 ## 📋 Changelog
+
+### v3.1.0 (2026-02-12)
+- 🙈 **Vocab**: ระบบ Blur Study Mode (เลือกเบลอคอลัมน์ได้)
+- 🎨 **Theme**: Warm Crimson + Charcoal + Eye-Friendly Hanzi
+- 🧹 **Data**: Dedup 1,231 → 1,121 คำ + A-Z sort
+- 📱 **Mobile**: แก้ tap highlight + blur touch fix
+
+### v3.0.0 (2026-02-11)
+- 🔍 Search Modal (Ctrl+K) + Vocabulary Table
+- 🎨 UI Redesign v3.0 (Premium, Glassmorphism)
+- 🌗 Dark/Light Theme System
 
 ### v2.2.0 (2026-01-19)
 - ⭐ **Flashcard**: ระบบทำเครื่องหมายคำยาก (Difficult Words)

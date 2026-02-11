@@ -1,3 +1,132 @@
+/* ===== CSS Custom Properties (Theme System) ===== */
+:root,
+[data-theme="dark"] {
+    --bg-primary: #18181b;
+    --bg-secondary: #1f1f23;
+    --bg-card: linear-gradient(145deg, #27272a, #1f1f23);
+    --bg-card-flat: #232326;
+    --bg-input: rgba(255, 255, 255, 0.06);
+    --bg-overlay: rgba(0, 0, 0, 0.85);
+    --bg-dot-color: rgba(248, 113, 113, 0.04);
+
+    --text-primary: #e4e4e7;
+    --text-secondary: #a1a1aa;
+    --text-muted: #71717a;
+    --text-hanzi: #f5f0e8;
+
+    --accent-gold: #f87171;
+    --accent-gold-hover: #fca5a5;
+    --accent-gold-bg: rgba(248, 113, 113, 0.10);
+    --accent-gold-border: rgba(248, 113, 113, 0.20);
+
+    --accent-blue: #a78bfa;
+    --accent-blue-bg: rgba(167, 139, 250, 0.10);
+
+    --accent-red: #fca5a5;
+    --accent-red-bg: rgba(252, 165, 165, 0.12);
+
+    --accent-green: #86efac;
+    --accent-green-bg: rgba(134, 239, 172, 0.12);
+
+    --accent-yellow: #fde68a;
+    --accent-yellow-bg: rgba(253, 230, 138, 0.12);
+
+    --card-front-bg: linear-gradient(145deg, #27272a, #1f1f23);
+    --card-back-bg: linear-gradient(145deg, #991b1b, #7f1d1d);
+    --card-border: rgba(248, 113, 113, 0.15);
+
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --border-medium: rgba(255, 255, 255, 0.10);
+
+    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.35);
+    --shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.45);
+
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.07);
+
+    --tag-bg: rgba(255, 255, 255, 0.05);
+    --tag-border: rgba(255, 255, 255, 0.08);
+    --tag-text: #a1a1aa;
+}
+
+[data-theme="light"] {
+    --bg-primary: #fafaf9;
+    --bg-secondary: #ffffff;
+    --bg-card: linear-gradient(145deg, #ffffff, #f5f5f4);
+    --bg-card-flat: #ffffff;
+    --bg-input: rgba(0, 0, 0, 0.04);
+    --bg-overlay: rgba(0, 0, 0, 0.5);
+    --bg-dot-color: rgba(220, 38, 38, 0.05);
+
+    --text-primary: #18181b;
+    --text-secondary: #52525b;
+    --text-muted: #a1a1aa;
+    --text-hanzi: #2c2520;
+
+    --accent-gold: #dc2626;
+    --accent-gold-hover: #b91c1c;
+    --accent-gold-bg: rgba(220, 38, 38, 0.08);
+    --accent-gold-border: rgba(220, 38, 38, 0.18);
+
+    --accent-blue: #7c3aed;
+    --accent-blue-bg: rgba(124, 58, 237, 0.1);
+
+    --accent-red: #dc2626;
+    --accent-red-bg: rgba(220, 38, 38, 0.1);
+
+    --accent-green: #16a34a;
+    --accent-green-bg: rgba(22, 163, 74, 0.1);
+
+    --accent-yellow: #d97706;
+    --accent-yellow-bg: rgba(217, 119, 6, 0.1);
+
+    --card-front-bg: linear-gradient(145deg, #ffffff, #fafaf9);
+    --card-back-bg: linear-gradient(145deg, #dc2626, #b91c1c);
+    --card-border: rgba(220, 38, 38, 0.18);
+
+    --border-subtle: rgba(0, 0, 0, 0.06);
+    --border-medium: rgba(0, 0, 0, 0.1);
+
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 12px 36px rgba(0, 0, 0, 0.12);
+
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.08);
+
+    --tag-bg: rgba(0, 0, 0, 0.04);
+    --tag-border: rgba(0, 0, 0, 0.08);
+    --tag-text: #71717a;
+}
+
+/* ===== Theme Toggle ===== */
+.theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 999;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--accent-gold-border);
+    background: var(--bg-card-flat);
+    color: var(--accent-gold);
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(10px);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1) rotate(15deg);
+    border-color: var(--accent-gold);
+    box-shadow: var(--shadow-hover);
+}
+
+/* ===== Global Reset ===== */
 * {
     margin: 0;
     padding: 0;
@@ -11,7 +140,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d1b1b 100%);
+    background: var(--bg-primary);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -30,19 +159,24 @@
 .loading-spinner {
     width: 64px;
     height: 64px;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top: 4px solid #d4af37;
+    border: 4px solid var(--border-subtle);
+    border-top: 4px solid var(--accent-gold);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .loading-screen p {
-    color: #d4af37;
+    color: var(--accent-gold);
     font-size: 1.2rem;
     font-weight: 500;
     letter-spacing: 0.5px;
@@ -55,9 +189,9 @@
     gap: 8px;
     padding: 10px 20px;
     border-radius: 25px;
-    border: 2px solid rgba(212, 175, 55, 0.3);
+    border: 2px solid var(--accent-gold-border);
     background: transparent;
-    color: #d4af37;
+    color: var(--accent-gold);
     font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s;
@@ -66,19 +200,24 @@
 }
 
 .back-home-btn:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border-color: #d4af37;
+    background: var(--accent-gold-bg);
+    border-color: var(--accent-gold);
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
-    font-family: 'Noto Sans Thai', 'Noto Sans SC', sans-serif;
-    background-color: #1a1a1a;
-    background-image: 
-        radial-gradient(circle, rgba(200, 160, 100, 0.08) 1px, transparent 1px);
+    font-family: 'Inter', 'Noto Sans Thai', 'Noto Sans SC', sans-serif;
+    background-color: var(--bg-primary);
+    background-image:
+        radial-gradient(circle, var(--bg-dot-color) 1px, transparent 1px);
     background-size: 20px 20px;
     min-height: 100vh;
-    color: #f5f0e6;
+    color: var(--text-primary);
     padding: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .container {
@@ -95,8 +234,8 @@ body {
 .header h1 {
     font-size: 2rem;
     margin-bottom: 15px;
-    color: #e8c170;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    color: var(--accent-gold);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .stats-bar {
@@ -145,15 +284,15 @@ body {
     gap: 16px;
     margin-bottom: 24px;
     padding: 16px;
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--glass-bg);
     border-radius: 12px;
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    border: 1px solid var(--accent-gold-border);
     flex-wrap: wrap;
 }
 
 .filter-section label {
     font-size: 1rem;
-    color: #d4af37;
+    color: var(--accent-gold);
     font-weight: 600;
     letter-spacing: 0.5px;
 }
@@ -161,9 +300,9 @@ body {
 .filter-section select {
     padding: 12px 16px;
     border-radius: 8px;
-    border: 2px solid rgba(212, 175, 55, 0.3);
-    background: rgba(0, 0, 0, 0.3);
-    color: white;
+    border: 2px solid var(--accent-gold-border);
+    background: var(--bg-input);
+    color: var(--text-primary);
     font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -177,12 +316,12 @@ body {
 
 .filter-section select:focus {
     outline: none;
-    border-color: #d4af37;
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px var(--accent-gold-bg);
 }
 
 .filter-section select option {
-    background: #1a1a1a;
+    background: var(--bg-primary);
 }
 
 /* Progress Container */
@@ -192,9 +331,9 @@ body {
     align-items: center;
     margin-bottom: 20px;
     padding: 15px;
-    background: rgba(232, 193, 112, 0.05);
+    background: var(--glass-bg);
     border-radius: 10px;
-    border: 1px solid rgba(232, 193, 112, 0.2);
+    border: 1px solid var(--accent-gold-border);
 }
 
 .progress-bar-wrapper {
@@ -227,7 +366,7 @@ body {
 .card-counter {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #e8c170;
+    color: var(--accent-gold);
     white-space: nowrap;
     min-width: 80px;
     text-align: right;
@@ -294,10 +433,13 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
         opacity: 1;
     }
+
     50% {
         transform: scale(1.05);
         opacity: 0.9;
@@ -305,15 +447,19 @@ body {
 }
 
 @keyframes feedbackBounce {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: scale(1);
     }
+
     50% {
         transform: scale(1.1);
     }
 }
 
-.btn-shuffle, .btn-reset {
+.btn-shuffle,
+.btn-reset {
     padding: 12px 20px;
     border-radius: 8px;
     border: 2px solid transparent;
@@ -388,7 +534,8 @@ body {
     transform: rotateY(180deg);
 }
 
-.card-front, .card-back {
+.card-front,
+.card-back {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -399,37 +546,33 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: var(--shadow-card);
 }
 
 .card-front {
-    background: linear-gradient(145deg, #2c2416, #1a1510);
-    border: 2px solid rgba(232, 193, 112, 0.2);
-    box-shadow: 
-        0 20px 60px rgba(0,0,0,0.4),
-        inset 0 0 100px rgba(232, 193, 112, 0.03);
+    background: var(--card-front-bg);
+    border: 2px solid var(--card-border);
+    box-shadow: var(--shadow-card);
 }
 
 .card-back {
-    background: linear-gradient(145deg, #8b1a1a, #5c1111);
-    border: 2px solid rgba(232, 193, 112, 0.3);
+    background: var(--card-back-bg);
+    border: 2px solid var(--card-border);
     transform: rotateY(180deg);
     overflow-y: auto;
-    box-shadow: 
-        0 20px 60px rgba(0,0,0,0.4),
-        inset 0 0 80px rgba(232, 193, 112, 0.05);
+    box-shadow: var(--shadow-card);
 }
 
 .card-type {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(232, 193, 112, 0.2);
+    background: var(--accent-gold-bg);
     padding: 5px 12px;
     border-radius: 15px;
     font-size: 0.8rem;
-    color: #e8c170;
-    border: 1px solid rgba(232, 193, 112, 0.3);
+    color: var(--accent-gold);
+    border: 1px solid var(--accent-gold-border);
 }
 
 .hanzi {
@@ -437,22 +580,22 @@ body {
     font-size: 6rem;
     font-weight: 400;
     margin-bottom: 10px;
-    color: #e8c170;
-    text-shadow: 
-        2px 2px 4px rgba(0,0,0,0.5),
-        0 0 30px rgba(232, 193, 112, 0.2);
+    color: var(--text-hanzi);
+    text-shadow:
+        2px 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 30px var(--accent-gold-bg);
 }
 
 .pinyin {
     font-size: 1.3rem;
-    color: #ffeaa7;
+    color: var(--accent-yellow);
     margin-bottom: 10px;
     letter-spacing: 1px;
 }
 
 .btn-sound {
-    background: linear-gradient(135deg, #c0392b, #a93226);
-    border: 2px solid rgba(232, 193, 112, 0.3);
+    background: linear-gradient(135deg, var(--accent-red), #a93226);
+    border: 2px solid var(--card-border);
     width: 60px;
     height: 60px;
     border-radius: 50%;
@@ -519,7 +662,7 @@ body {
 .flip-hint {
     position: absolute;
     bottom: 15px;
-    color: rgba(255,255,255,0.5);
+    color: var(--text-muted);
     font-size: 0.8rem;
 }
 
@@ -534,30 +677,30 @@ body {
 .meaning {
     font-size: 1.4rem;
     font-weight: 600;
-    color: #ffeaa7;
+    color: var(--accent-yellow);
     margin-bottom: 15px;
     text-align: center;
 }
 
 .example {
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.2);
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 10px;
     width: 100%;
-    border-left: 3px solid #e8c170;
+    border-left: 3px solid var(--accent-gold);
 }
 
 .example-cn {
     font-family: 'Noto Serif SC', serif;
     font-size: 1.1rem;
     margin-bottom: 8px;
-    color: #f5f0e6;
+    color: var(--text-primary);
 }
 
 .example-th {
     font-size: 0.9rem;
-    color: #c9c0b0;
+    color: var(--text-secondary);
 }
 
 .note {
@@ -596,7 +739,7 @@ body {
 
 .stroke-container {
     display: none;
-    background: rgba(255,255,255,0.95);
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 15px;
     padding: 20px;
     margin-top: 10px;
@@ -668,7 +811,7 @@ body {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
     transition: left 0.5s ease;
 }
 
@@ -679,7 +822,7 @@ body {
 .btn-emoji {
     font-size: 2rem;
     display: block;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .btn-text {
@@ -692,8 +835,8 @@ body {
     top: 8px;
     right: 8px;
     font-size: 0.75rem;
-    color: rgba(255,255,255,0.4);
-    background: rgba(0,0,0,0.3);
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(0, 0, 0, 0.3);
     width: 24px;
     height: 24px;
     border-radius: 4px;
@@ -705,12 +848,12 @@ body {
 
 .btn-answer:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .btn-answer:active:not(:disabled) {
     transform: translateY(0);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn-answer:focus {
@@ -833,13 +976,13 @@ body {
     text-align: center;
     padding: 20px;
     margin-top: 40px;
-    border-top: 1px solid rgba(212, 175, 55, 0.2);
-    color: rgba(212, 175, 55, 0.7);
+    border-top: 1px solid var(--border-subtle);
+    color: var(--text-muted);
     font-size: 0.9rem;
 }
 
 .footer strong {
-    color: #d4af37;
+    color: var(--accent-gold);
     font-weight: 700;
     letter-spacing: 0.5px;
 }
@@ -912,7 +1055,8 @@ body {
         font-size: 4.5rem;
     }
 
-    .card-front, .card-back {
+    .card-front,
+    .card-back {
         padding: 20px;
     }
 
@@ -1005,7 +1149,8 @@ body {
 
     .filter-section label {
         font-size: 0.85rem;
-        display: none; /* ซ่อนคำว่า "แสดง:" เพื่อประหยัดพื้นที่ */
+        display: none;
+        /* ซ่อนคำว่า "แสดง:" เพื่อประหยัดพื้นที่ */
     }
 
     .filter-section select {
@@ -1065,7 +1210,8 @@ body {
         line-height: 1.4;
     }
 
-    .card-front, .card-back {
+    .card-front,
+    .card-back {
         padding: 20px;
     }
 
@@ -1198,6 +1344,7 @@ body {
 
 /* Touch-friendly improvements */
 @media (hover: none) and (pointer: coarse) {
+
     /* ปุ่มทั้งหมดขนาดขั้นต่ำตาม Apple/Google Guidelines */
     .btn-answer,
     .btn-nav,

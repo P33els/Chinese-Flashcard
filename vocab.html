@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Vocabulary Table - 词汇表</title>
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="theme.js"></script>
+    <style>
+        .vocab-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .vocab-header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-top: 20px;
+        }
+
+        .vocab-header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .vocab-header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Controls */
+        .vocab-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .vocab-search-wrapper {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .vocab-search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .vocab-search {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border-radius: 14px;
+            border: 2px solid var(--border-subtle);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s;
+            backdrop-filter: blur(8px);
+        }
+
+        .vocab-search:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 4px var(--accent-gold-bg);
+        }
+
+        .vocab-search::placeholder {
+            color: var(--text-muted);
+        }
+
+        .vocab-filter {
+            padding: 14px 16px;
+            border-radius: 14px;
+            border: 2px solid var(--border-subtle);
+            background: var(--glass-bg);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(8px);
+            min-width: 160px;
+        }
+
+        .vocab-filter:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 4px var(--accent-gold-bg);
+        }
+
+        .vocab-filter option {
+            background: var(--bg-primary);
+        }
+
+        /* Stats Bar */
+        .vocab-stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding: 12px 20px;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+        }
+
+        .vocab-stats strong {
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .vocab-stats-divider {
+            width: 1px;
+            height: 16px;
+            background: var(--border-subtle);
+        }
+
+        /* Table */
+        .vocab-table-wrapper {
+            border-radius: 16px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            background: var(--glass-bg);
+            backdrop-filter: blur(8px);
+            margin-bottom: 24px;
+        }
+
+        .vocab-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .vocab-table thead th {
+            background: var(--bg-card-flat);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-gold);
+            border-bottom: 2px solid var(--accent-gold-border);
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .vocab-table thead th.th-no {
+            width: 50px;
+            text-align: center;
+        }
+
+        .vocab-table thead th.th-hanzi {
+            width: 100px;
+        }
+
+        .vocab-table thead th.th-pinyin {
+            width: 120px;
+        }
+
+        .vocab-table thead th.th-type {
+            width: 130px;
+        }
+
+        .vocab-table thead th.th-sound {
+            width: 60px;
+            text-align: center;
+        }
+
+        .vocab-table tbody tr {
+            border-bottom: 1px solid var(--border-subtle);
+            transition: background 0.15s;
+        }
+
+        .vocab-table tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .vocab-table tbody tr:hover {
+            background: var(--accent-gold-bg);
+        }
+
+        .vocab-table td {
+            padding: 14px 16px;
+            vertical-align: middle;
+        }
+
+        .vocab-table .td-no {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .vocab-table .td-hanzi {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 1.5rem;
+            color: var(--text-hanzi);
+            font-weight: 400;
+            transition: filter 0.3s ease;
+        }
+
+        /* Blur mode — per-column classes */
+        .vocab-table.blur-hanzi .td-hanzi {
+            filter: blur(8px);
+            cursor: pointer;
+            user-select: none;
+            transition: filter 0.3s ease;
+        }
+
+        .vocab-table.blur-pinyin .td-pinyin {
+            filter: blur(8px);
+            cursor: pointer;
+            user-select: none;
+            transition: filter 0.3s ease;
+        }
+
+        .vocab-table.blur-meaning .td-meaning {
+            filter: blur(8px);
+            cursor: pointer;
+            user-select: none;
+            transition: filter 0.3s ease;
+        }
+
+        /* Tap to reveal (works on all devices) */
+        .vocab-table.blur-hanzi .td-hanzi.revealed,
+        .vocab-table.blur-pinyin .td-pinyin.revealed,
+        .vocab-table.blur-meaning .td-meaning.revealed {
+            filter: blur(0);
+        }
+
+        /* Hover to reveal (desktop only — prevents sticky hover on mobile) */
+        @media (hover: hover) {
+
+            .vocab-table.blur-hanzi .td-hanzi:hover,
+            .vocab-table.blur-pinyin .td-pinyin:hover,
+            .vocab-table.blur-meaning .td-meaning:hover {
+                filter: blur(0);
+            }
+        }
+
+        /* Blur dropdown wrapper */
+        .blur-dropdown-wrapper {
+            position: relative;
+        }
+
+        .blur-toggle {
+            padding: 14px 20px;
+            border-radius: 14px;
+            border: 2px solid var(--border-subtle);
+            background: var(--glass-bg);
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(8px);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .blur-toggle:hover {
+            border-color: var(--accent-gold-border);
+            color: var(--accent-gold);
+        }
+
+        .blur-toggle.active {
+            background: var(--accent-gold-bg);
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .blur-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: var(--bg-card-flat);
+            border: 1px solid var(--border-medium);
+            border-radius: 14px;
+            padding: 8px 0;
+            min-width: 200px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+            z-index: 100;
+            animation: slideDown 0.15s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .blur-dropdown.open {
+            display: block;
+        }
+
+        .blur-dropdown-title {
+            padding: 8px 16px 6px;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        .blur-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            user-select: none;
+        }
+
+        .blur-option:hover {
+            background: var(--accent-gold-bg);
+        }
+
+        .blur-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-gold);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .blur-option-label {
+            flex: 1;
+        }
+
+        .blur-option-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .vocab-table .td-pinyin {
+            color: var(--accent-blue);
+            font-size: 0.95rem;
+        }
+
+        .vocab-table .td-meaning {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .vocab-table .td-type {
+            font-size: 0.8rem;
+        }
+
+        .vocab-table .td-type span {
+            background: var(--tag-bg);
+            padding: 3px 10px;
+            border-radius: 8px;
+            color: var(--tag-text);
+            border: 1px solid var(--tag-border);
+            white-space: nowrap;
+        }
+
+        .vocab-table .td-example {
+            font-family: 'Noto Serif SC', serif;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.4;
+        }
+
+        .vocab-table .td-sound {
+            text-align: center;
+        }
+
+        .btn-sound-sm {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid var(--accent-gold-border);
+            background: var(--accent-gold-bg);
+            color: var(--accent-gold);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-sound-sm:hover {
+            background: var(--accent-gold);
+            color: var(--bg-primary);
+            transform: scale(1.1);
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .pagination-btn {
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-subtle);
+            background: var(--glass-bg);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--accent-gold-border);
+            color: var(--accent-gold);
+            background: var(--accent-gold-bg);
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg, var(--accent-gold), var(--accent-gold-hover));
+            color: var(--bg-primary);
+            border-color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-info {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            padding: 0 12px;
+        }
+
+        /* No results */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .no-results-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            display: block;
+            opacity: 0.5;
+        }
+
+        .no-results-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .vocab-footer {
+            text-align: center;
+            padding: 24px 0;
+            border-top: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .vocab-footer strong {
+            color: var(--accent-gold);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .vocab-container {
+                padding: 12px;
+            }
+
+            .vocab-header h1 {
+                font-size: 1.7rem;
+            }
+
+            .vocab-controls {
+                flex-direction: column;
+            }
+
+            .vocab-filter {
+                width: 100%;
+            }
+
+            .vocab-table .td-type {
+                display: none;
+            }
+
+            .vocab-table thead th.th-type {
+                display: none;
+            }
+
+            .vocab-table .td-example {
+                display: none;
+            }
+
+            .vocab-table thead th.th-example {
+                display: none;
+            }
+
+            .vocab-table .td-hanzi {
+                font-size: 1.3rem;
+            }
+
+            .vocab-table td {
+                padding: 10px 10px;
+            }
+
+            .vocab-table thead th {
+                padding: 10px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .vocab-table .td-no {
+                display: none;
+            }
+
+            .vocab-table thead th.th-no {
+                display: none;
+            }
+
+            .vocab-header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+
+    <div class="vocab-container">
+        <!-- Back Button -->
+        <a href="index.html" class="back-home-btn">← กลับหน้าหลัก</a>
+
+        <!-- Header -->
+        <div class="vocab-header">
+            <h1>📋 Vocabulary Table · 词汇表</h1>
+            <p>รายการคำศัพท์ HSK3 ทั้งหมดพร้อมพินอิน คำแปล และตัวอย่างประโยค</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="vocab-controls">
+            <div class="vocab-search-wrapper">
+                <svg class="vocab-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input type="text" class="vocab-search" id="vocabSearch"
+                    placeholder="ค้นหาคำศัพท์... (จีน, พินอิน, ไทย)" autocomplete="off">
+            </div>
+            <select class="vocab-filter" id="vocabFilter">
+                <option value="all">📚 ทุกประเภท</option>
+            </select>
+            <div class="blur-dropdown-wrapper">
+                <button class="blur-toggle" id="blurToggle" title="เบลอคอลัมน์เพื่อฝึกจำ">
+                    <span>🙈</span>
+                    <span>เบลอ ▾</span>
+                </button>
+                <div class="blur-dropdown" id="blurDropdown">
+                    <div class="blur-dropdown-title">เลือกคอลัมน์ที่ต้องการเบลอ</div>
+                    <label class="blur-option">
+                        <input type="checkbox" id="blurHanzi" value="hanzi">
+                        <span class="blur-option-label">汉字 ตัวอักษรจีน</span>
+                    </label>
+                    <label class="blur-option">
+                        <input type="checkbox" id="blurPinyin" value="pinyin">
+                        <span class="blur-option-label">拼音 พินอิน</span>
+                    </label>
+                    <label class="blur-option">
+                        <input type="checkbox" id="blurMeaning" value="meaning">
+                        <span class="blur-option-label">คำแปล ความหมาย</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="vocab-stats">
+            <span>แสดง <strong id="showingCount">0</strong> จาก <strong id="totalCount">0</strong> คำ</span>
+            <span class="vocab-stats-divider"></span>
+            <span>หน้า <strong id="currentPageNum">1</strong> จาก <strong id="totalPages">1</strong></span>
+        </div>
+
+        <!-- Table -->
+        <div class="vocab-table-wrapper">
+            <table class="vocab-table">
+                <thead>
+                    <tr>
+                        <th class="th-no">#</th>
+                        <th class="th-hanzi">汉字</th>
+                        <th class="th-pinyin">拼音</th>
+                        <th>คำแปล</th>
+                        <th class="th-type">ประเภท</th>
+                        <th class="th-example">ตัวอย่าง</th>
+                        <th class="th-sound">ฟัง</th>
+                    </tr>
+                </thead>
+                <tbody id="vocabBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" id="noResults" style="display:none;">
+            <span class="no-results-icon">😕</span>
+            <div class="no-results-text">ไม่พบคำศัพท์ที่ค้นหา</div>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+
+        <!-- Footer -->
+        <footer class="vocab-footer">
+            <p>Made with ❤️ by <strong>PRNXT</strong></p>
+        </footer>
+    </div>
+
+    <script src="words.js"></script>
+    <script>
+        // ===== Constants =====
+        const ITEMS_PER_PAGE = 50;
+        let allWords = [];
+        let filteredWords = [];
+        let currentPage = 1;
+        let types = new Set();
+
+        // ===== DOM =====
+        const vocabBody = document.getElementById('vocabBody');
+        const vocabSearch = document.getElementById('vocabSearch');
+        const vocabFilter = document.getElementById('vocabFilter');
+        const paginationEl = document.getElementById('pagination');
+        const noResults = document.getElementById('noResults');
+        const showingCount = document.getElementById('showingCount');
+        const totalCount = document.getElementById('totalCount');
+        const currentPageNum = document.getElementById('currentPageNum');
+        const totalPagesEl = document.getElementById('totalPages');
+        const tableWrapper = document.querySelector('.vocab-table-wrapper');
+
+        // ===== Load Data =====
+        async function loadData() {
+            try {
+                if (typeof wordsData !== 'undefined') {
+                    allWords = wordsData;
+                } else {
+                    const response = await fetch('words.json');
+                    allWords = await response.json();
+                }
+
+                // Extract types
+                allWords.forEach(w => {
+                    if (w.type) types.add(w.type);
+                });
+
+                // Populate filter
+                const sortedTypes = [...types].sort();
+                sortedTypes.forEach(type => {
+                    const opt = document.createElement('option');
+                    opt.value = type;
+                    opt.textContent = type;
+                    vocabFilter.appendChild(opt);
+                });
+
+                filteredWords = [...allWords].sort((a, b) => a.pinyin.localeCompare(b.pinyin));
+                renderPage();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+
+        // ===== Filter & Search =====
+        function applyFilters() {
+            const query = vocabSearch.value.trim().toLowerCase();
+            const typeFilter = vocabFilter.value;
+
+            filteredWords = allWords.filter(word => {
+                const matchesSearch = !query ||
+                    word.hanzi.toLowerCase().includes(query) ||
+                    word.pinyin.toLowerCase().includes(query) ||
+                    word.meaning.toLowerCase().includes(query);
+
+                const matchesType = typeFilter === 'all' || word.type === typeFilter;
+
+                return matchesSearch && matchesType;
+            }).sort((a, b) => a.pinyin.localeCompare(b.pinyin));
+
+            currentPage = 1;
+            renderPage();
+        }
+
+        vocabSearch.addEventListener('input', applyFilters);
+        vocabFilter.addEventListener('change', applyFilters);
+
+        // ===== Render =====
+        function renderPage() {
+            const totalItems = filteredWords.length;
+            const totalPageCount = Math.max(1, Math.ceil(totalItems / ITEMS_PER_PAGE));
+
+            if (currentPage > totalPageCount) currentPage = totalPageCount;
+
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = Math.min(start + ITEMS_PER_PAGE, totalItems);
+            const pageItems = filteredWords.slice(start, end);
+
+            // Update stats
+            showingCount.textContent = totalItems;
+            totalCount.textContent = allWords.length;
+            currentPageNum.textContent = currentPage;
+            totalPagesEl.textContent = totalPageCount;
+
+            // Show/hide elements
+            if (totalItems === 0) {
+                noResults.style.display = 'block';
+                tableWrapper.style.display = 'none';
+                paginationEl.style.display = 'none';
+            } else {
+                noResults.style.display = 'none';
+                tableWrapper.style.display = 'block';
+                paginationEl.style.display = 'flex';
+            }
+
+            // Render table
+            let html = '';
+            pageItems.forEach((word, i) => {
+                const globalIndex = start + i + 1;
+                html += `<tr>
+                    <td class="td-no">${globalIndex}</td>
+                    <td class="td-hanzi">${escapeHtml(word.hanzi)}</td>
+                    <td class="td-pinyin">${escapeHtml(word.pinyin)}</td>
+                    <td class="td-meaning">${escapeHtml(word.meaning)}</td>
+                    <td class="td-type"><span>${escapeHtml(word.type || '-')}</span></td>
+                    <td class="td-example">${escapeHtml(word.example_cn || '-')}</td>
+                    <td class="td-sound"><button class="btn-sound-sm" onclick="speakChinese('${escapeHtml(word.hanzi)}')">🔊</button></td>
+                </tr>`;
+            });
+            vocabBody.innerHTML = html;
+
+            // Render pagination
+            renderPagination(totalPageCount);
+        }
+
+        function renderPagination(totalPageCount) {
+            if (totalPageCount <= 1) {
+                paginationEl.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            html += `<button class="pagination-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← ก่อนหน้า</button>`;
+
+            // Smart pagination: show first, last, and nearby pages
+            const pages = [];
+            pages.push(1);
+            for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPageCount - 1, currentPage + 2); i++) {
+                pages.push(i);
+            }
+            if (totalPageCount > 1) pages.push(totalPageCount);
+
+            // Remove duplicates and sort
+            const uniquePages = [...new Set(pages)].sort((a, b) => a - b);
+
+            let lastPage = 0;
+            uniquePages.forEach(page => {
+                if (page - lastPage > 1) {
+                    html += `<span class="pagination-info">...</span>`;
+                }
+                html += `<button class="pagination-btn ${page === currentPage ? 'active' : ''}" onclick="goToPage(${page})">${page}</button>`;
+                lastPage = page;
+            });
+
+            html += `<button class="pagination-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPageCount ? 'disabled' : ''}>ถัดไป →</button>`;
+
+            paginationEl.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            const totalPageCount = Math.ceil(filteredWords.length / ITEMS_PER_PAGE);
+            if (page < 1 || page > totalPageCount) return;
+            currentPage = page;
+            renderPage();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ===== TTS =====
+        function speakChinese(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-CN';
+                utterance.rate = 0.8;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // ===== Blur Dropdown =====
+        const blurToggle = document.getElementById('blurToggle');
+        const blurDropdown = document.getElementById('blurDropdown');
+        const vocabTable = document.querySelector('.vocab-table');
+        const blurCheckboxes = document.querySelectorAll('#blurDropdown input[type="checkbox"]');
+
+        blurToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            blurDropdown.classList.toggle('open');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.blur-dropdown-wrapper')) {
+                blurDropdown.classList.remove('open');
+            }
+        });
+
+        // Handle checkbox changes
+        blurCheckboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                updateBlurClasses();
+            });
+        });
+
+        function updateBlurClasses() {
+            vocabTable.classList.remove('blur-hanzi', 'blur-pinyin', 'blur-meaning');
+            // Remove all revealed states when toggling
+            vocabTable.querySelectorAll('.revealed').forEach(el => el.classList.remove('revealed'));
+
+            let anyActive = false;
+            blurCheckboxes.forEach(cb => {
+                if (cb.checked) {
+                    vocabTable.classList.add('blur-' + cb.value);
+                    anyActive = true;
+                }
+            });
+            blurToggle.classList.toggle('active', anyActive);
+        }
+
+        // Click/tap to toggle reveal individual cell (mobile-friendly)
+        vocabBody.addEventListener('click', (e) => {
+            const td = e.target.closest('.td-hanzi, .td-pinyin, .td-meaning');
+            if (!td) return;
+
+            // Check if this column has blur active via table class
+            const isHanzi = td.classList.contains('td-hanzi') && vocabTable.classList.contains('blur-hanzi');
+            const isPinyin = td.classList.contains('td-pinyin') && vocabTable.classList.contains('blur-pinyin');
+            const isMeaning = td.classList.contains('td-meaning') && vocabTable.classList.contains('blur-meaning');
+
+            if (isHanzi || isPinyin || isMeaning) {
+                td.classList.toggle('revealed');
+            }
+        });
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+
+</html>

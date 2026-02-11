@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,7 +9,10 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Listening - 听力练习</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700&family=Noto+Sans+Thai:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="theme.js"></script>
     <style>
         .listening-container {
             max-width: 900px;
@@ -44,8 +48,8 @@
 
         .listening-header h1 {
             font-size: 2rem;
-            color: #e8c170;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: var(--text-hanzi);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             margin-bottom: 10px;
         }
 
@@ -109,7 +113,7 @@
 
         .listen-hanzi {
             font-size: 4rem;
-            color: #e8c170;
+            color: var(--text-hanzi);
             font-family: 'Noto Serif SC', serif;
             margin-bottom: 10px;
         }
@@ -174,9 +178,17 @@
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.4); }
-            70% { box-shadow: 0 0 0 25px rgba(46, 213, 115, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(46, 213, 115, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(46, 213, 115, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 25px rgba(46, 213, 115, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(46, 213, 115, 0);
+            }
         }
 
         /* Speed Control */
@@ -609,7 +621,7 @@
 
         .quiz-complete h2 {
             font-size: 2rem;
-            color: #e8c170;
+            color: var(--text-hanzi);
             margin-bottom: 20px;
         }
 
@@ -661,7 +673,11 @@
         }
     </style>
 </head>
+
 <body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">☀️</button>
+
     <div class="listening-container">
         <!-- Back Button -->
         <a href="index.html" class="back-btn">← กลับหน้าหลัก</a>
@@ -690,7 +706,7 @@
 
                 <div class="listen-play-section">
                     <button class="listen-main-btn" id="mainPlayBtn">🔊</button>
-                    
+
                     <div class="listen-speed-control">
                         <span class="listen-speed-label">ความเร็ว:</span>
                         <button class="speed-btn" data-speed="0.5">0.5x</button>
@@ -733,12 +749,13 @@
             <div class="listen-stats" id="quizStats">
                 <span class="stat-item correct">✓ ถูก: <span id="correctCount">0</span></span>
                 <span class="stat-item wrong">✗ ผิด: <span id="wrongCount">0</span></span>
-                <span class="stat-item total">📚 ข้อ: <span id="questionNum">1</span>/<span id="totalQuestions">10</span></span>
+                <span class="stat-item total">📚 ข้อ: <span id="questionNum">1</span>/<span
+                        id="totalQuestions">10</span></span>
             </div>
 
             <div class="quiz-card" id="quizCard">
                 <p class="quiz-prompt" id="quizPrompt">ฟังเสียงแล้วเลือกคำที่ถูกต้อง:</p>
-                
+
                 <button class="quiz-play-btn" id="quizPlayBtn">🔊</button>
 
                 <div class="quiz-options" id="quizOptions">
@@ -832,10 +849,10 @@
         // Mode switching
         function switchMode(mode) {
             currentMode = mode;
-            
+
             listenModeBtn.classList.toggle('active', mode === 'listen');
             quizModeBtn.classList.toggle('active', mode === 'quiz');
-            
+
             listenContent.classList.toggle('active', mode === 'listen');
             quizContent.classList.toggle('active', mode === 'quiz');
 
@@ -859,9 +876,9 @@
             document.getElementById('listenHanzi').textContent = item.hanzi;
             document.getElementById('listenPinyin').textContent = item.pinyin;
             document.getElementById('listenType').textContent = item.type;
-            
-            const meanings = Array.isArray(item.meaning_th) 
-                ? item.meaning_th.join(', ') 
+
+            const meanings = Array.isArray(item.meaning_th)
+                ? item.meaning_th.join(', ')
                 : item.meaning_th;
             document.getElementById('listenMeaning').textContent = meanings;
 
@@ -937,7 +954,7 @@
             isAutoPlaying = true;
             document.getElementById('autoPlayBtn').style.display = 'none';
             document.getElementById('stopAutoBtn').style.display = 'flex';
-            
+
             playCurrentItemAuto();
         }
 
@@ -945,7 +962,7 @@
             isAutoPlaying = false;
             document.getElementById('autoPlayBtn').style.display = 'flex';
             document.getElementById('stopAutoBtn').style.display = 'none';
-            
+
             if (autoPlayTimeout) {
                 clearTimeout(autoPlayTimeout);
                 autoPlayTimeout = null;
@@ -957,7 +974,7 @@
             if (!isAutoPlaying) return;
 
             const item = grammarPoints[currentIndex];
-            
+
             // Play main word
             speakChinese(item.hanzi);
 
@@ -966,12 +983,12 @@
             item.examples.forEach((ex, idx) => {
                 autoPlayTimeout = setTimeout(() => {
                     if (!isAutoPlaying) return;
-                    
+
                     // Highlight current sentence
                     document.querySelectorAll('.sentence-item').forEach(s => s.classList.remove('playing'));
                     const sentenceItem = document.querySelector(`.sentence-item[data-index="${idx}"]`);
                     if (sentenceItem) sentenceItem.classList.add('playing');
-                    
+
                     speakChinese(ex.zh);
                 }, delay);
                 delay += 3500;
@@ -980,9 +997,9 @@
             // Move to next item
             autoPlayTimeout = setTimeout(() => {
                 if (!isAutoPlaying) return;
-                
+
                 document.querySelectorAll('.sentence-item').forEach(s => s.classList.remove('playing'));
-                
+
                 if (currentIndex < grammarPoints.length - 1) {
                     displayListenItem(currentIndex + 1);
                     playCurrentItemAuto();
@@ -1015,7 +1032,7 @@
             currentQuizIndex = 0;
 
             quizQuestions = generateQuizQuestions();
-            
+
             document.getElementById('totalQuestions').textContent = quizQuestions.length;
             document.getElementById('correctCount').textContent = 0;
             document.getElementById('wrongCount').textContent = 0;
@@ -1058,7 +1075,7 @@
                 selected.forEach(item => {
                     if (item.examples && item.examples.length > 0) {
                         const example = item.examples[Math.floor(Math.random() * item.examples.length)];
-                        
+
                         const wrongMeanings = grammarPoints
                             .filter(g => g.hanzi !== item.hanzi && g.examples && g.examples.length > 0)
                             .sort(() => Math.random() - 0.5)
@@ -1157,11 +1174,11 @@
             const feedback = document.getElementById('quizFeedback');
             feedback.classList.add('show', isCorrect ? 'correct' : 'wrong');
             document.getElementById('feedbackTitle').textContent = isCorrect ? '✅ ถูกต้อง!' : '❌ ผิด!';
-            
+
             let feedbackContent = '';
             const item = question.answerData;
-            const meanings = Array.isArray(item.meaning_th) 
-                ? item.meaning_th.join(', ') 
+            const meanings = Array.isArray(item.meaning_th)
+                ? item.meaning_th.join(', ')
                 : item.meaning_th;
 
             if (question.type === 'hanzi') {
@@ -1171,7 +1188,7 @@
             } else if (question.type === 'pinyin') {
                 feedbackContent = `<strong>${item.hanzi}</strong> อ่านว่า <strong>${item.pinyin}</strong><br>${meanings}`;
             }
-            
+
             document.getElementById('feedbackText').innerHTML = feedbackContent;
 
             document.getElementById('nextQuestionBtn').style.display = 'inline-flex';
@@ -1193,7 +1210,7 @@
             else if (percentage >= 70) message = '👏 ทำได้ดี! ฝึกฟังต่อไปนะ';
             else if (percentage >= 50) message = '💪 พอใช้ได้! ลองฟังซ้ำบ่อยๆ';
             else message = '📚 ลองฝึกฟังเพิ่มเติมและทำใหม่อีกครั้ง';
-            
+
             document.getElementById('quizMessage').textContent = message;
         }
 
@@ -1232,4 +1249,5 @@
         loadData();
     </script>
 </body>
+
 </html>
